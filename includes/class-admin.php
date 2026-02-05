@@ -25,7 +25,7 @@ class Custom_Advance_Repeater_Admin {
             __('Field Groups', 'custom-advance-repeater'),
             __('Field Groups', 'custom-advance-repeater'),
             'manage_options',
-            'car-field-groups',
+            'carf-field-groups',
             array($this, 'field_groups_page')
         );
         
@@ -34,7 +34,7 @@ class Custom_Advance_Repeater_Admin {
             __('Add New Field Group', 'custom-advance-repeater'),
             __('Add New', 'custom-advance-repeater'),
             'manage_options',
-            'car-add-field-group',
+            'carf-add-field-group',
             array($this, 'add_field_group_page')
         );
     }
@@ -45,7 +45,7 @@ class Custom_Advance_Repeater_Admin {
         }
         
         // CSS
-        wp_enqueue_style('car-admin-css', CAR_PLUGIN_URL . 'assets/css/admin.css', array(), CAR_VERSION);
+        wp_enqueue_style('carf-admin-css', carf_PLUGIN_URL . 'assets/css/admin.css', array(), carf_VERSION);
         
         // Libraries
         wp_enqueue_script('jquery');
@@ -59,11 +59,11 @@ class Custom_Advance_Repeater_Admin {
         wp_enqueue_style('wp-jquery-ui-dialog');
         
         // JS
-        wp_enqueue_script('car-admin-js', CAR_PLUGIN_URL . 'assets/js/admin.js', array('jquery', 'jquery-ui-datepicker', 'wp-color-picker'), CAR_VERSION, true);
+        wp_enqueue_script('carf-admin-js', carf_PLUGIN_URL . 'assets/js/admin.js', array('jquery', 'jquery-ui-datepicker', 'wp-color-picker'), carf_VERSION, true);
         
         // Localize vars to JS
-        wp_localize_script('car-admin-js', 'car_admin_vars', array(
-            'ajax_nonce' => wp_create_nonce('car_ajax_nonce'),
+        wp_localize_script('carf-admin-js', 'carf_admin_vars', array(
+            'ajax_nonce' => wp_create_nonce('carf_ajax_nonce'),
             'ajax_url'   => admin_url('admin-ajax.php')
         ));
     }
@@ -72,8 +72,8 @@ class Custom_Advance_Repeater_Admin {
         ?>
         <div class="wrap">
             <h1><?php _e('Custom Advance Repeater', 'custom-advance-repeater'); ?></h1>
-            <div class="car-dashboard">
-                <div class="car-card">
+            <div class="carf-dashboard">
+                <div class="carf-card">
                     <h2><?php _e('Getting Started', 'custom-advance-repeater'); ?></h2>
                     <ol>
                         <li><?php _e('Create Field Groups with your desired fields', 'custom-advance-repeater'); ?></li>
@@ -82,7 +82,7 @@ class Custom_Advance_Repeater_Admin {
                         <li><?php _e("Display data in your theme using the urf_get_repeater_with_labels('group slug', post id); functions", 'custom-advance-repeater'); ?></li>
                     </ol>
                 </div>
-                <div class="car-card">
+                <div class="carf-card">
                     <h2><?php _e('Available Field Types', 'custom-advance-repeater'); ?></h2>
                     <ul>
                         <li><strong><?php _e('Text', 'custom-advance-repeater'); ?></strong> - <?php _e('Simple text input', 'custom-advance-repeater'); ?></li>
@@ -96,7 +96,7 @@ class Custom_Advance_Repeater_Admin {
                         <li><strong><?php _e('Repeater Field', 'custom-advance-repeater'); ?></strong> - <?php _e('Nested repeater with sub-fields', 'custom-advance-repeater'); ?></li>
                     </ul>
                 </div>
-                <div class="car-card">
+                <div class="carf-card">
                     <h2><?php _e('New in Version 1.6.0', 'custom-advance-repeater'); ?></h2>
                     <ul>
                         <li><strong><?php _e('Nested Repeater Support', 'custom-advance-repeater'); ?></strong> - <?php _e('Repeater fields inside repeater fields', 'custom-advance-repeater'); ?></li>
@@ -107,19 +107,19 @@ class Custom_Advance_Repeater_Admin {
             </div>
         </div>
         <style>
-            .car-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-top: 20px; }
-            .car-card { background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-            .car-card h2 { margin-top: 0; border-bottom: 2px solid #0073aa; padding-bottom: 10px; }
-            .car-card ul, .car-card ol { padding-left: 20px; }
-            .car-card li { margin-bottom: 8px; }
+            .carf-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-top: 20px; }
+            .carf-card { background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            .carf-card h2 { margin-top: 0; border-bottom: 2px solid #0073aa; padding-bottom: 10px; }
+            .carf-card ul, .carf-card ol { padding-left: 20px; }
+            .carf-card li { margin-bottom: 8px; }
         </style>
         <?php
     }
 
     public function field_groups_page() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_field_groups';
-        $fields_table = $wpdb->prefix . 'car_fields';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
+        $fields_table = $wpdb->prefix . 'carf_fields';
         
         if (isset($_GET['delete'])) {
             $id = intval($_GET['delete']);
@@ -146,7 +146,7 @@ class Custom_Advance_Repeater_Admin {
         ?>
         <div class="wrap">
             <h1><?php _e('Field Groups', 'custom-advance-repeater'); ?>
-                <a href="<?php echo admin_url('admin.php?page=car-add-field-group'); ?>" class="page-title-action">
+                <a href="<?php echo admin_url('admin.php?page=carf-add-field-group'); ?>" class="page-title-action">
                     <?php _e('Add New', 'custom-advance-repeater'); ?>
                 </a>
             </h1>
@@ -205,10 +205,10 @@ class Custom_Advance_Repeater_Admin {
                                 </td>
                                 <td><?php echo is_array($fields) ? count($fields) : 0; ?></td>
                                 <td>
-                                    <a href="<?php echo admin_url('admin.php?page=car-add-field-group&edit=' . $group->id); ?>" class="button button-small">
+                                    <a href="<?php echo admin_url('admin.php?page=carf-add-field-group&edit=' . $group->id); ?>" class="button button-small">
                                         <?php _e('Edit', 'custom-advance-repeater'); ?>
                                     </a>
-                                    <a href="<?php echo admin_url('admin.php?page=car-field-groups&delete=' . $group->id); ?>" class="button button-small button-link-delete" onclick="return confirm('<?php _e('Are you sure you want to delete this field group?', 'custom-advance-repeater'); ?>');">
+                                    <a href="<?php echo admin_url('admin.php?page=carf-field-groups&delete=' . $group->id); ?>" class="button button-small button-link-delete" onclick="return confirm('<?php _e('Are you sure you want to delete this field group?', 'custom-advance-repeater'); ?>');">
                                         <?php _e('Delete', 'custom-advance-repeater'); ?>
                                     </a>
                                 </td>
@@ -232,8 +232,8 @@ class Custom_Advance_Repeater_Admin {
             $success_message = '<div class="notice notice-success"><p>' . __('Field group saved successfully!', 'custom-advance-repeater') . '</p></div>';
         }
         
-        if (isset($_POST['save_field_group'], $_POST['car_field_group_nonce'])) {
-            if (!wp_verify_nonce($_POST['car_field_group_nonce'], 'car_save_field_group')) {
+        if (isset($_POST['save_field_group'], $_POST['carf_field_group_nonce'])) {
+            if (!wp_verify_nonce($_POST['carf_field_group_nonce'], 'carf_save_field_group')) {
                 $error_message = '<div class="notice notice-error"><p>Security check failed</p></div>';
             } elseif (!current_user_can('manage_options')) {
                 $error_message = '<div class="notice notice-error"><p>Permission denied</p></div>';
@@ -242,8 +242,8 @@ class Custom_Advance_Repeater_Admin {
                 
                 if ($result === true) {
                     $redirect_url = !empty($_POST['group_id'])
-                        ? admin_url('admin.php?page=car-add-field-group&edit=' . intval($_POST['group_id']) . '&saved=1')
-                        : admin_url('admin.php?page=car-field-groups&saved=1');
+                        ? admin_url('admin.php?page=carf-add-field-group&edit=' . intval($_POST['group_id']) . '&saved=1')
+                        : admin_url('admin.php?page=carf-field-groups&saved=1');
                     
                     echo '<script type="text/javascript">
                         window.location.href = ' . json_encode($redirect_url) . ';
@@ -269,7 +269,7 @@ class Custom_Advance_Repeater_Admin {
             ?>
             
             <form method="post" action="">
-                <?php wp_nonce_field('car_save_field_group', 'car_field_group_nonce'); ?>
+                <?php wp_nonce_field('carf_save_field_group', 'carf_field_group_nonce'); ?>
                 <input type="hidden" name="group_id" value="<?php echo $group_id; ?>">
                 
                 <table class="form-table">
@@ -292,7 +292,7 @@ class Custom_Advance_Repeater_Admin {
                     </tr>
                     
                     <tr>
-                        <th scope="row"><label><?php _e('Display Logic', 'custom-advance-repeater'); ?></label></th>
+                        <th scope="row"><label><?php _e('Show this field group', 'custom-advance-repeater'); ?></label></th>
                         <td>
                             <p>
                                 <label>
@@ -350,7 +350,7 @@ class Custom_Advance_Repeater_Admin {
                                     </button>
                                 </div>
                                 
-                                <div id="selected-pages-container" class="selected_pages_container" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; margin-bottom: 10px;">
+                                <div id="selected-pages-container" class="selected_pages_container" style="display: none; max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; background: #f9f9f9; margin-bottom: 10px;">
                                     <?php
                                     $selected_pages = $group ? maybe_unserialize($group->pages) : array();
                                     
@@ -394,7 +394,7 @@ class Custom_Advance_Repeater_Admin {
                 
                 <h2><?php _e('Fields', 'custom-advance-repeater'); ?></h2>
                 
-                <div id="car-fields-container">
+                <div id="carf-fields-container">
                     <?php
                     $fields_count = 0;
                     if ($group) {
@@ -409,7 +409,7 @@ class Custom_Advance_Repeater_Admin {
                     ?>
                 </div>
                 
-                <button type="button" id="car-add-field" class="button button-secondary add_field_btn">
+                <button type="button" id="carf-add-field" class="button button-secondary add_field_btn">
                     <span class="dashicons dashicons-plus"></span> <?php _e('Add Field', 'custom-advance-repeater'); ?>
                 </button>
                 
@@ -420,7 +420,7 @@ class Custom_Advance_Repeater_Admin {
                         <?php _e('Save Field Group', 'custom-advance-repeater'); ?>
                     </button>
                     <?php if ($group): ?>
-                        <a href="<?php echo admin_url('admin.php?page=car-field-groups'); ?>" class="button button-secondary" style="margin-left: 10px;">
+                        <a href="<?php echo admin_url('admin.php?page=carf-field-groups'); ?>" class="button button-secondary" style="margin-left: 10px;">
                             <?php _e('Cancel', 'custom-advance-repeater'); ?>
                         </a>
                     <?php endif; ?>
@@ -430,7 +430,7 @@ class Custom_Advance_Repeater_Admin {
 
         <?php
         // Pass variables to admin.js to handle the specific logic of this page
-        wp_localize_script('car-admin-js', 'car_field_group_config', array(
+        wp_localize_script('carf-admin-js', 'carf_field_group_config', array(
             'fields_count' => $fields_count,
             'is_all_types' => ($group && is_array($selected_types) && in_array('all', $selected_types)) ? true : false,
             'i18n' => array(
@@ -479,7 +479,7 @@ class Custom_Advance_Repeater_Admin {
         // Output provided in add_field_group_page PHP method above or via JS construction
         // This PHP helper is for rendering existing saved fields
         ?>
-        <div class="car-field-row" style="margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #ccd0d4; border-radius: 4px;">
+        <div class="carf-field-row" style="margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #ccd0d4; border-radius: 4px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;" class="panel_row">
                 <h3 class="top_left_panel" style="margin: 0;"><?php _e('Field', 'custom-advance-repeater'); ?> #<span class="field-index"><?php echo $index + 1; ?></span></h3>
                 <div class="top_right_panel">
@@ -489,7 +489,7 @@ class Custom_Advance_Repeater_Admin {
                             <?php _e('Required Field', 'custom-advance-repeater'); ?>
                         </label>
                     </div>
-                    <a href="#" class="car-remove-field" style="color: #dc3232; text-decoration: none;">
+                    <a href="#" class="carf-remove-field" style="color: #dc3232; text-decoration: none;">
                         <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                     </a>
                 </div>
@@ -498,7 +498,7 @@ class Custom_Advance_Repeater_Admin {
             <div class="inner_row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
                 <div class="inner_colm">
                     <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
-                    <select name="fields[<?php echo $index; ?>][type]" class="car-field-type widefat" required>
+                    <select name="fields[<?php echo $index; ?>][type]" class="carf-field-type widefat" required>
                         <option value="text" <?php selected($field['type'] ?? '', 'text'); ?>><?php _e('Text', 'custom-advance-repeater'); ?></option>
                         <option value="textarea" <?php selected($field['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
                         <option value="image" <?php selected($field['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
@@ -515,19 +515,19 @@ class Custom_Advance_Repeater_Admin {
                     <label><?php _e('Field Label', 'custom-advance-repeater'); ?> *</label>
                     <input type="text" name="fields[<?php echo $index; ?>][label]" 
                            value="<?php echo esc_attr($field['label'] ?? ''); ?>" 
-                           class="car-field-label widefat" required>
+                           class="carf-field-label widefat" required>
                 </div>
                 
                 <div class="inner_colm">
                     <label><?php _e('Field Name', 'custom-advance-repeater'); ?> *</label>
                     <input type="text" name="fields[<?php echo $index; ?>][name]" 
                            value="<?php echo esc_attr($field['name'] ?? ''); ?>" 
-                           class="car-field-name widefat" required>
+                           class="carf-field-name widefat" required>
                     <p class="description"><?php _e('Lowercase, underscores, no spaces', 'custom-advance-repeater'); ?></p>
                 </div>
             </div>
             
-            <div class="car-field-options" style="display: <?php echo in_array($field['type'] ?? '', ['select', 'checkbox', 'radio', 'repeater']) ? 'block' : 'none'; ?>; margin-bottom: 15px;">
+            <div class="carf-field-options" style="display: <?php echo in_array($field['type'] ?? '', ['select', 'checkbox', 'radio', 'repeater']) ? 'block' : 'none'; ?>; margin-bottom: 15px;">
                 <?php if (in_array($field['type'] ?? '', ['select', 'checkbox', 'radio'])): ?>
                     <label><?php _e('Options (one per line)', 'custom-advance-repeater'); ?></label>
                     <?php
@@ -549,12 +549,12 @@ class Custom_Advance_Repeater_Admin {
                         $options_text = implode("\n", $labels);
                     }
                     ?>
-                    <textarea name="fields[<?php echo $index; ?>][options]" class="widefat" rows="3" placeholder="My Option 1"><?php echo esc_textarea($options_text); ?></textarea>
+                    <textarea name="fields[<?php echo $index; ?>][options]" class="widefat" rows="5" placeholder="My Option 1"><?php echo esc_textarea($options_text); ?></textarea>
                     <p class="description"><?php _e('Enter options one per line.', 'custom-advance-repeater'); ?></p>
 
                 <?php elseif (($field['type'] ?? '') === 'repeater'): ?>
                     <label class="sub_label" style=" font-size: 16px;font-weight: 600;"><?php _e('Sub Fields', 'custom-advance-repeater'); ?></label>
-                    <div class="car-subfields-container" style="margin-top: 6px;" data-parent-index="<?php echo $index; ?>">
+                    <div class="carf-subfields-container" style="margin-top: 6px;" data-parent-index="<?php echo $index; ?>">
                         <?php
                         if (isset($field['subfields']) && is_array($field['subfields'])) {
                             foreach ($field['subfields'] as $sub_index => $subfield) {
@@ -563,7 +563,7 @@ class Custom_Advance_Repeater_Admin {
                         }
                         ?>
                     </div>
-                    <button type="button" class="button button-small car-add-subfield add_field_btn" data-parent-index="<?php echo $index; ?>">
+                    <button type="button" class="button button-small carf-add-subfield add_field_btn" data-parent-index="<?php echo $index; ?>">
                         <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'custom-advance-repeater'); ?>
                     </button>
                     <p class="description"><?php _e('Add fields that will appear inside this repeater', 'custom-advance-repeater'); ?></p>
@@ -577,7 +577,7 @@ class Custom_Advance_Repeater_Admin {
 
     public function render_subfield_row($parent_index, $sub_index, $subfield = array()) {
         ?>
-        <div class="car-subfield-row" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f9f9f9;">
+        <div class="carf-subfield-row" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f9f9f9;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;" class="panel_row">
                 <strong class="top_left_panel"><?php _e('Sub Field', 'custom-advance-repeater'); ?></strong>
                 <div class="top_right_panel">
@@ -587,7 +587,7 @@ class Custom_Advance_Repeater_Admin {
                             <?php _e('Required Field', 'custom-advance-repeater'); ?>
                         </label>
                     </div>
-                    <a href="#" class="car-remove-subfield" style="color: #dc3232; text-decoration: none;">
+                    <a href="#" class="carf-remove-subfield" style="color: #dc3232; text-decoration: none;">
                         <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                     </a>
                 </div>
@@ -596,7 +596,7 @@ class Custom_Advance_Repeater_Admin {
             <div class="inner_row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div class="inner_colm">
                     <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
-                    <select name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][type]" class="widefat car-subfield-type" required>
+                    <select name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][type]" class="widefat carf-subfield-type" required>
                         <option value="text" <?php selected($subfield['type'] ?? '', 'text'); ?>><?php _e('Text', 'custom-advance-repeater'); ?></option>
                         <option value="textarea" <?php selected($subfield['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
                         <option value="image" <?php selected($subfield['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
@@ -625,7 +625,7 @@ class Custom_Advance_Repeater_Admin {
                 </div>
             </div>
             
-            <div class="car-subfield-options" style="display: <?php echo in_array($subfield['type'] ?? '', ['select', 'checkbox', 'radio', 'repeater']) ? 'block' : 'none'; ?>; margin-bottom: 10px;">
+            <div class="carf-subfield-options" style="display: <?php echo in_array($subfield['type'] ?? '', ['select', 'checkbox', 'radio', 'repeater']) ? 'block' : 'none'; ?>; margin-bottom: 10px;">
                 <?php if (in_array($subfield['type'] ?? '', ['select', 'checkbox', 'radio'])): ?>
                     <label><?php _e('Options', 'custom-advance-repeater'); ?></label>
                     <?php
@@ -647,12 +647,12 @@ class Custom_Advance_Repeater_Admin {
                         $options_text = implode("\n", $labels);
                     }
                     ?>
-                    <textarea name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][options]" class="widefat" rows="2"><?php echo esc_textarea($options_text); ?></textarea>
+                    <textarea name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][options]" class="widefat" rows="5"><?php echo esc_textarea($options_text); ?></textarea>
                     <p class="description"><?php _e('Enter options one per line.', 'custom-advance-repeater'); ?></p>
 
                 <?php elseif (($subfield['type'] ?? '') === 'repeater'): ?>
                     <label><?php _e('Sub Fields', 'custom-advance-repeater'); ?></label>
-                    <div class="car-subfields-container" data-parent-index="<?php echo $parent_index; ?>" data-sub-index="<?php echo $sub_index; ?>">
+                    <div class="carf-subfields-container" data-parent-index="<?php echo $parent_index; ?>" data-sub-index="<?php echo $sub_index; ?>">
                         <?php
                         if (isset($subfield['subfields']) && is_array($subfield['subfields'])) {
                             foreach ($subfield['subfields'] as $nested_sub_index => $nested_subfield) {
@@ -661,7 +661,7 @@ class Custom_Advance_Repeater_Admin {
                         }
                         ?>
                     </div>
-                    <button type="button" class="button button-small car-add-nested-subfield add_field_btn" data-parent-index="<?php echo $parent_index; ?>" data-sub-index="<?php echo $sub_index; ?>">
+                    <button type="button" class="button button-small carf-add-nested-subfield add_field_btn" data-parent-index="<?php echo $parent_index; ?>" data-sub-index="<?php echo $sub_index; ?>">
                         <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'custom-advance-repeater'); ?>
                     </button>
                     <p class="description"><?php _e('Add fields that will appear inside this repeater', 'custom-advance-repeater'); ?></p>
@@ -675,7 +675,7 @@ class Custom_Advance_Repeater_Admin {
 
     public function render_nested_subfield_row($parent_index, $sub_index, $nested_index, $subfield = array()) {
         ?>
-        <div class="car-nested-subfield-row" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: #f0f0f0;">
+        <div class="carf-nested-subfield-row" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: #f0f0f0;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;" class="panel_row">
                 <strong class="top_left_panel"><?php _e('Nested Sub Field', 'custom-advance-repeater'); ?></strong>
                 <div class="top_right_panel">
@@ -685,7 +685,7 @@ class Custom_Advance_Repeater_Admin {
                             <?php _e('Required Field', 'custom-advance-repeater'); ?>
                         </label>
                     </div>
-                    <a href="#" class="car-remove-nested-subfield" style="color: #dc3232; text-decoration: none;">
+                    <a href="#" class="carf-remove-nested-subfield" style="color: #dc3232; text-decoration: none;">
                         <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                     </a>
                 </div>
@@ -694,7 +694,7 @@ class Custom_Advance_Repeater_Admin {
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;" class="inner_row">
                 <div class="inner_colm">
                     <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
-                    <select name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][subfields][<?php echo $nested_index; ?>][type]" class="widefat" required>
+                    <select name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][subfields][<?php echo $nested_index; ?>][type]" class="widefat carf-nested-subfield-type" required>
                         <option value="text" <?php selected($subfield['type'] ?? '', 'text'); ?>><?php _e('Text', 'custom-advance-repeater'); ?></option>
                         <option value="textarea" <?php selected($subfield['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
                         <option value="image" <?php selected($subfield['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
@@ -720,14 +720,40 @@ class Custom_Advance_Repeater_Admin {
                 </div>
             </div>
             
-           
+            <div class="carf-nested-subfield-options" style="display: <?php echo in_array($subfield['type'] ?? '', ['select', 'checkbox', 'radio']) ? 'block' : 'none'; ?>; margin-bottom: 10px;">
+                <?php if (in_array($subfield['type'] ?? '', ['select', 'checkbox', 'radio'])): ?>
+                    <label><?php _e('Options', 'custom-advance-repeater'); ?></label>
+                    <?php
+                    $options_text = '';
+                    if (!empty($subfield['options'])) {
+                        $lines = explode("\n", $subfield['options']);
+                        $labels = [];
+                        foreach ($lines as $line) {
+                            $line = trim($line);
+                            if (!empty($line)) {
+                                if (strpos($line, '|') !== false) {
+                                    list($value, $label) = explode('|', $line, 2);
+                                    $labels[] = trim($label);
+                                } else {
+                                    $labels[] = $line;
+                                }
+                            }
+                        }
+                        $options_text = implode("\n", $labels);
+                    }
+                    ?>
+                    <textarea name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][subfields][<?php echo $nested_index; ?>][options]" class="widefat" rows="5"><?php echo esc_textarea($options_text); ?></textarea>
+                    <p class="description"><?php _e('Enter options one per line.', 'custom-advance-repeater'); ?></p>
+                <?php endif; ?>
+            </div>
+            
         </div>
         <?php
     }
 
     public function add_meta_boxes() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         
         $current_screen = get_current_screen();
         if (!$current_screen) return;
@@ -737,7 +763,7 @@ class Custom_Advance_Repeater_Admin {
         foreach ($all_field_groups as $group) {
             if ($this->should_display_field_group($group, get_the_ID())) {
                 add_meta_box(
-                    'car_field_group_' . $group->slug,
+                    'carf_field_group_' . $group->slug,
                     $group->name,
                     array($this, 'render_field_group_meta_box'),
                     $current_screen->post_type,
@@ -794,21 +820,21 @@ class Custom_Advance_Repeater_Admin {
         
         ?>
         
-        <div class="car-field-group" data-group="<?php echo esc_attr($group->slug); ?>">
-            <input type="hidden" name="car_field_group[]" value="<?php echo esc_attr($group->slug); ?>">
-            <input type="hidden" name="car_nonce_<?php echo esc_attr($group->slug); ?>" value="<?php echo wp_create_nonce('car_save_fields_' . $group->slug); ?>">
+        <div class="carf-field-group" data-group="<?php echo esc_attr($group->slug); ?>">
+            <input type="hidden" name="carf_field_group[]" value="<?php echo esc_attr($group->slug); ?>">
+            <input type="hidden" name="carf_nonce_<?php echo esc_attr($group->slug); ?>" value="<?php echo wp_create_nonce('carf_save_fields_' . $group->slug); ?>">
             
-            <div class="car-vertical-fields">
+            <div class="carf-vertical-fields">
                 <?php foreach ($fields as $field): 
                     $field_name = $field['name'];
                     $field_value = isset($field_values[$field_name]) ? $field_values[$field_name] : '';
                     
                     if ($field['type'] === 'repeater') continue;
                     
-                    $input_name = "car_data[{$group->slug}][{$field_name}]";
-                    $input_id = "car_{$group->slug}_{$field_name}";
+                    $input_name = "carf_data[{$group->slug}][{$field_name}]";
+                    $input_id = "carf_{$group->slug}_{$field_name}";
                 ?>
-                    <div class="car-vertical-field">
+                    <div class="carf-vertical-field">
                         <label>
                             <?php echo esc_html($field['label']); ?>
                             <?php if ($field['required'] ?? false): ?>
@@ -828,7 +854,7 @@ class Custom_Advance_Repeater_Admin {
                     $repeater_data = isset($data[$field['name']]) ? $data[$field['name']] : array();
                     $subfields = $field['subfields'] ?? array();
                 ?>
-                    <div class="car-vertical-field">
+                    <div class="carf-vertical-field">
                         <label>
                             <?php echo esc_html($field['label']); ?>
                             <?php if ($field['required'] ?? false): ?>
@@ -836,22 +862,9 @@ class Custom_Advance_Repeater_Admin {
                             <?php endif; ?>
                         </label>
                         
-                        <div class="car-nested-repeater" data-field-name="<?php echo esc_attr($field['name']); ?>" data-row-index="0">
-                            <table class="car-repeater-table car-nested-table" style="margin-top: 0;">
-                                <thead>
-                                    <tr>
-                                        <th class="car-row-handle">#</th>
-                                        <?php foreach ($subfields as $subfield): ?>
-                                            <th><?php echo esc_html($subfield['label']); ?>
-                                                <?php if ($subfield['required'] ?? false): ?>
-                                                    <span style="color: #dc3232;">*</span>
-                                                <?php endif; ?>
-                                            </th>
-                                        <?php endforeach; ?>
-                                        <th class="car-row-actions"><?php _e('Actions', 'custom-advance-repeater'); ?></th>
-                                    </tr>
-                                </thead>
-                                <tbody class="car-nested-tbody">
+                        <div class="carf-nested-repeater" data-field-name="<?php echo esc_attr($field['name']); ?>" data-row-index="0">
+                            <table class="carf-repeater-table carf-nested-table" style="margin-top: 0;">
+                                <tbody class="carf-nested-tbody">
                                     <?php if (!empty($repeater_data)): ?>
                                         <?php foreach ($repeater_data as $nested_index => $nested_row): ?>
                                             <?php $this->render_nested_repeater_row($subfields, $field['name'], $group->slug, 0, $nested_index, $nested_row); ?>
@@ -862,11 +875,13 @@ class Custom_Advance_Repeater_Admin {
                                 </tbody>
                             </table>
                             
-                            <button type="button" class="button button-small car-add-nested-row" 
+                            <div style="padding: 0 15px;">
+                                <button type="button" class="button button-small carf-add-nested-row" 
                                     data-field-name="<?php echo esc_attr($field['name']); ?>" 
                                     data-row-index="0">
-                                <span class="dashicons dashicons-plus"></span> <?php _e('Add Row', 'custom-advance-repeater'); ?>
-                            </button>
+                                    <span class="dashicons dashicons-plus"></span> <?php _e('Add Row', 'custom-advance-repeater'); ?>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 <?php endforeach; ?>
@@ -900,7 +915,7 @@ class Custom_Advance_Repeater_Admin {
                 <textarea name="<?php echo $name; ?>" 
                           id="<?php echo $id; ?>" 
                           class="widefat" 
-                          rows="3"
+                          rows="5"
                           <?php echo $required ? 'required' : ''; ?>><?php echo esc_textarea($value); ?></textarea>
                 <?php
                 break;
@@ -915,13 +930,13 @@ class Custom_Advance_Repeater_Admin {
                     $image_value = '';
                 }
                 ?>
-                <div class="car-file-upload-container" data-field-type="image">
-                    <button type="button" class="button car-upload-button" data-multiple="false">
+                <div class="carf-file-upload-container" data-field-type="image">
+                    <button type="button" class="button carf-upload-button" data-multiple="false">
                         <?php _e('Select Image', 'custom-advance-repeater'); ?>
                     </button>
-                    <input type="hidden" name="<?php echo $name; ?>" id="<?php echo $id; ?>" value="<?php echo esc_attr($image_value); ?>" class="car-file-input">
+                    <input type="hidden" name="<?php echo $name; ?>" id="<?php echo $id; ?>" value="<?php echo esc_attr($image_value); ?>" class="carf-file-input">
                     
-                    <div class="car-file-preview">
+                    <div class="carf-file-preview">
                         <?php if (!empty($image_value)): 
                             if (is_numeric($image_value)) {
                                 $image_url = wp_get_attachment_url($image_value);
@@ -929,14 +944,14 @@ class Custom_Advance_Repeater_Admin {
                                 $filename = basename($image_url);
                             } else {
                                 $image_url = $image_value;
-                                $image_thumb = '<img src="' . esc_url($image_value) . '" class="car-image-preview">';
+                                $image_thumb = '<img src="' . esc_url($image_value) . '" class="carf-image-preview">';
                                 $filename = basename($image_value);
                             }
                         ?>
-                            <div class="car-file-item" data-attachment-id="<?php echo esc_attr($image_value); ?>">
+                            <div class="carf-file-item" data-attachment-id="<?php echo esc_attr($image_value); ?>">
                                 <?php echo $image_thumb; ?>
-                                <div class="car-file-name"><?php echo esc_html($filename); ?></div>
-                                <button type="button" class="car-remove-file dashicons dashicons-no-alt" title="<?php _e('Remove', 'custom-advance-repeater'); ?>"></button>
+                                <div class="carf-file-name"><?php echo esc_html($filename); ?></div>
+                                <button type="button" class="carf-remove-file dashicons dashicons-no-alt" title="<?php _e('Remove', 'custom-advance-repeater'); ?>"></button>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -979,7 +994,7 @@ class Custom_Advance_Repeater_Admin {
                 
             case 'checkbox':
                 ?>
-                <div class="car-checkbox-group">
+                <div class="carf-checkbox-group">
                     <?php
                     $values = is_array($value) ? $value : array($value);
                     $options = explode("\n", $field['options'] ?? '');
@@ -1015,7 +1030,7 @@ class Custom_Advance_Repeater_Admin {
                     $radio_value = !empty($radio_value) ? reset($radio_value) : '';
                 }
                 ?>
-                <div class="car-radio-group">
+                <div class="carf-radio-group">
                     <?php
                     $options = explode("\n", $field['options'] ?? '');
                     foreach ($options as $option) {
@@ -1055,7 +1070,7 @@ class Custom_Advance_Repeater_Admin {
                        name="<?php echo $name; ?>" 
                        id="<?php echo $id; ?>" 
                        value="<?php echo esc_attr($color_value); ?>" 
-                       class="car-colorpicker"
+                       class="carf-colorpicker"
                        data-default-color="#ffffff">
                 <?php
                 break;
@@ -1070,7 +1085,7 @@ class Custom_Advance_Repeater_Admin {
                        name="<?php echo $name; ?>" 
                        id="<?php echo $id; ?>" 
                        value="<?php echo esc_attr($date_value); ?>" 
-                       class="car-datepicker widefat"
+                       class="carf-datepicker widefat"
                        <?php echo $required ? 'required' : ''; ?>>
                 <?php
                 break;
@@ -1093,7 +1108,7 @@ class Custom_Advance_Repeater_Admin {
     }
 
     public function render_nested_repeater_row($subfields, $parent_field_name, $group_slug, $parent_row_index, $nested_index, $nested_row, $is_clone = false) {
-        $row_class = $is_clone ? 'car-clone-nested-row' : '';
+        $row_class = $is_clone ? 'carf-clone-nested-row' : '';
         $display = $is_clone ? 'style="display: none;"' : '';
         
         $index_name = $is_clone ? '__NESTED_INDEX__' : $nested_index;
@@ -1101,23 +1116,23 @@ class Custom_Advance_Repeater_Admin {
         
         ?>
         <tr class="<?php echo $row_class; ?>" <?php echo $display; ?> data-nested-index="<?php echo $index_name; ?>">
-            <td class="car-row-handle" style="width: 60px; min-width: 60px; max-width: 60px;">
+            <td class="carf-row-handle" style="width: 60px; min-width: 60px; max-width: 60px;">
                 <span class="dashicons dashicons-menu"></span>
                 <span class="nested-row-index"><?php echo $display_index; ?></span>
             </td>
             
             <td style="width: 100%;" colspan="<?php echo count($subfields); ?>">
-                <div style="display: flex; flex-direction: column; gap: 20px; padding: 15px; background: #f8fafc; border-radius: 8px;">
+                <div class="repeater_field_body" style="display: flex; flex-direction: column; border-radius: 8px;">
                     <?php foreach ($subfields as $subfield_index => $subfield): 
                         $subfield_name = $subfield['name'];
                         $field_value = isset($nested_row[$subfield_name]) ? $nested_row[$subfield_name] : '';
                         
-                        $input_name = "car_data[{$group_slug}][{$parent_field_name}][{$index_name}][{$subfield_name}]";
-                        $input_id = "car_{$group_slug}_{$parent_field_name}_{$index_name}_{$subfield_name}";
+                        $input_name = "carf_data[{$group_slug}][{$parent_field_name}][{$index_name}][{$subfield_name}]";
+                        $input_id = "carf_{$group_slug}_{$parent_field_name}_{$index_name}_{$subfield_name}";
                     ?>
-                        <div class="car-subfield-container" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: <?php echo ($subfield_index === count($subfields) - 1) ? '0' : '15px'; ?>;">
-                            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
-                                <div style="flex: 0 0 150px;">
+                        <div class="carf-subfield-container" style=" padding: 15px 0; margin-bottom: <?php echo ($subfield_index === count($subfields) - 1) ? '0' : '15px'; ?>;">
+                            <div style="display: flex; gap: 15px; margin-bottom: 15px;" class="carf-inner-row">
+                                <div style="flex: 0 0 180px;" class="carf-inner-label">
                                     <label style="font-weight: 600; color: #1e293b; display: block; margin-bottom: 8px;">
                                         <?php echo esc_html($subfield['label']); ?>
                                         <?php if ($subfield['required'] ?? false): ?>
@@ -1127,33 +1142,20 @@ class Custom_Advance_Repeater_Admin {
                                     
                                 </div>
                                 
-                                <div style="flex: 1;">
+                                <div style="flex: 1;" class="carf-inner-content">
                                     <?php 
                                     if (isset($subfield['type']) && $subfield['type'] === 'repeater') {
                                         $nested_repeater_data = is_array($field_value) ? $field_value : array();
                                         $nested_subfields = isset($subfield['subfields']) ? $subfield['subfields'] : array();
                                         ?>
-                                        <div class="car-nested-repeater" 
+                                        <div class="carf-nested-repeater" 
                                              data-field-name="<?php echo esc_attr($subfield_name); ?>" 
                                              data-parent-field="<?php echo esc_attr($parent_field_name); ?>"
                                              data-row-index="<?php echo esc_attr($index_name); ?>">
                                             
-                                            <div class="car-nested-table-container" style="overflow-x: auto;">
-                                                <table class="car-repeater-table car-nested-table" style="margin-top: 10px; width: 100%;">
-                                                    <thead>
-                                                        <tr>
-                                                            <th class="car-row-handle" style="width: 50px;">#</th>
-                                                            <?php foreach ($nested_subfields as $nested_subfield): ?>
-                                                                <th style="min-width: 150px;"><?php echo esc_html($nested_subfield['label']); ?>
-                                                                    <?php if ($nested_subfield['required'] ?? false): ?>
-                                                                        <span style="color: #dc3232;">*</span>
-                                                                    <?php endif; ?>
-                                                                </th>
-                                                            <?php endforeach; ?>
-                                                            <th class="car-row-actions" style="width: 80px;"><?php _e('Actions', 'custom-advance-repeater'); ?></th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody class="car-nested-tbody">
+                                            <div class="carf-nested-table-container" style="overflow-x: auto;">
+                                                <table class="carf-repeater-table carf-nested-table" style="margin-top: 10px; width: 100%;">
+                                                    <tbody class="carf-nested-tbody">
                                                         <?php if (!empty($nested_repeater_data)): 
                                                             $nested2_index = 0;
                                                             foreach ($nested_repeater_data as $nested2_row): ?>
@@ -1167,7 +1169,7 @@ class Custom_Advance_Repeater_Admin {
                                                 </table>
                                             </div>
                                             
-                                            <button type="button" class="button button-small car-add-nested2-row" 
+                                            <button type="button" class="button button-small carf-add-nested2-row" 
                                                     data-field-name="<?php echo esc_attr($subfield_name); ?>" 
                                                     data-parent-field="<?php echo esc_attr($parent_field_name); ?>"
                                                     data-row-index="<?php echo esc_attr($index_name); ?>"
@@ -1188,8 +1190,8 @@ class Custom_Advance_Repeater_Admin {
                 </div>
             </td>
             
-            <td class="car-row-actions" style="width: 80px; min-width: 80px; max-width: 80px;">
-                <a href="#" class="car-remove-nested-row dashicons dashicons-trash" title="<?php _e('Remove Row', 'custom-advance-repeater'); ?>"></a>
+            <td class="carf-row-actions" style="width: 40px; min-width: 40px; max-width: 40px;">
+                <a href="#" class="carf-remove-nested-row dashicons dashicons-trash" title="<?php _e('Remove Row', 'custom-advance-repeater'); ?>"></a>
             </td>
         </tr>
         <?php
@@ -1212,7 +1214,7 @@ class Custom_Advance_Repeater_Admin {
             }
         }
         
-        $row_class = $is_clone ? 'car-clone-nested2-row' : '';
+        $row_class = $is_clone ? 'carf-clone-nested2-row' : '';
         $display = $is_clone ? 'style="display: none;"' : '';
         
         $index_name = $is_clone ? '__NESTED2_INDEX__' : $nested2_index;
@@ -1220,24 +1222,24 @@ class Custom_Advance_Repeater_Admin {
         
         ?>
         <tr class="<?php echo $row_class; ?>" <?php echo $display; ?> data-nested2-index="<?php echo $index_name; ?>">
-            <td class="car-row-handle" style="width: 60px; min-width: 60px; max-width: 60px;">
+            <td class="carf-row-handle" style="width: 50px; min-width: 50px; max-width: 50px;">
                 <span class="dashicons dashicons-menu"></span>
                 <span class="nested2-row-index"><?php echo $display_index; ?></span>
             </td>
             
             <td style="width: 100%;" colspan="<?php echo count($subfields); ?>">
-                <div style="display: flex; flex-direction: column; gap: 15px; padding: 15px; background: #f8fafc; border-radius: 8px;">
+                <div style="display: flex;flex-direction: column;padding: 0 15px;background: #ffffff;border-radius: 8px;border: 1px solid #e2e8f0;">
                     <?php foreach ($subfields as $subfield_index => $subfield): 
                         $subfield_name = $subfield['name'];
                         $field_value = isset($nested2_row[$subfield_name]) ? $nested2_row[$subfield_name] : '';
                         
                         // Create unique name for nested2 repeater field
-                        $input_name = "car_data[{$group_slug}][{$parent_field_name}][{$parent_row_index}][{$field_name}][{$index_name}][{$subfield_name}]";
-                        $input_id = "car_{$group_slug}_{$parent_field_name}_{$parent_row_index}_{$field_name}_{$index_name}_{$subfield_name}";
+                        $input_name = "carf_data[{$group_slug}][{$parent_field_name}][{$parent_row_index}][{$field_name}][{$index_name}][{$subfield_name}]";
+                        $input_id = "carf_{$group_slug}_{$parent_field_name}_{$parent_row_index}_{$field_name}_{$index_name}_{$subfield_name}";
                     ?>
-                        <div class="car-subfield-container" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: <?php echo ($subfield_index === count($subfields) - 1) ? '0' : '15px'; ?>;">
-                            <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
-                                <div style="flex: 0 0 150px;">
+                        <div class="carf-subfield-container" style="padding: 14px 0; margin-bottom: <?php echo ($subfield_index === count($subfields) - 1) ? '0' : '0'; ?>;">
+                            <div style="display: flex; align-items: flex-start; gap: 15px;" class="carf-inner-row">
+                                <div style="flex: 0 0 150px;" class="carf-inner-label">
                                     <label style="font-weight: 600; color: #1e293b; display: block; margin-bottom: 8px;">
                                         <?php echo esc_html($subfield['label']); ?>
                                         <?php if ($subfield['required'] ?? false): ?>
@@ -1246,7 +1248,7 @@ class Custom_Advance_Repeater_Admin {
                                     </label>
                                 </div>
                                 
-                                <div style="flex: 1;">
+                                <div style="flex: 1;" class="carf-inner-content">
                                     <?php $this->render_field_input($subfield, $input_name, $input_id, $field_value, $index_name, $group_slug, $parent_row_index); ?>
                                 </div>
                             </div>
@@ -1255,8 +1257,8 @@ class Custom_Advance_Repeater_Admin {
                 </div>
             </td>
             
-            <td class="car-row-actions" style="width: 80px; min-width: 80px; max-width: 80px; vertical-align: middle;">
-                <a href="#" class="car-remove-nested2-row dashicons dashicons-trash" title="<?php _e('Remove Row', 'custom-advance-repeater'); ?>"></a>
+            <td class="carf-row-actions" style="width: 40px; min-width: 40px; max-width: 40px; vertical-align: middle;">
+                <a href="#" class="carf-remove-nested2-row dashicons dashicons-trash" title="<?php _e('Remove Row', 'custom-advance-repeater'); ?>"></a>
             </td>
         </tr>
         <?php

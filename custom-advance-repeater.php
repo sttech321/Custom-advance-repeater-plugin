@@ -2,7 +2,8 @@
 /*
 Plugin Name: Custom Advance Repeater
 Description: A WordPress plugin that allows you to manage dynamic repeater fields with various field types, including nested repeaters.
-Version: 1.6.0
+Support Email: St.tech321@gmail.com
+Version: 1.8.1
 Author: Supreme
 Text Domain: custom-advance-repeater
 Domain Path: /languages
@@ -14,28 +15,29 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('CAR_VERSION', '1.6.0');
-define('CAR_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('CAR_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('carf_VERSION', '1.8.1');
+define('carf_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('carf_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Require the core class
-require_once CAR_PLUGIN_DIR . 'includes/class-core.php';
+require_once carf_PLUGIN_DIR . 'includes/class-core.php';                   
+
 
 // Initialize the plugin
-function car_init() {
+function carf_init() {
     Custom_Advance_Repeater_Core::get_instance();
 }
-add_action('plugins_loaded', 'car_init');
+add_action('plugins_loaded', 'carf_init');
 
 // --- Helper functions for theme developers (Kept global as per original) ---
 
-if (!function_exists('car_get_repeater')) {
-    function car_get_repeater($field_group, $post_id = null) {
+if (!function_exists('carf_get_repeater')) {
+    function carf_get_repeater($field_group, $post_id = null) {
         $plugin = Custom_Advance_Repeater_Core::get_instance();
         $post_id = $post_id ?: get_the_ID();
         
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         $group = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE slug = %s", $field_group));
         
         if (!$group) {
@@ -50,10 +52,10 @@ if (!function_exists('car_get_repeater')) {
         // Access DB logic to get data
         return $plugin->db->get_field_data($post_id, $field_group);
     }
-}
+} 
 
-if (!function_exists('car_display_repeater')) {
-    function car_display_repeater($field_group, $post_id = null, $limit = -1) {
+if (!function_exists('carf_display_repeater')) {
+    function carf_display_repeater($field_group, $post_id = null, $limit = -1) {
         $plugin = Custom_Advance_Repeater_Core::get_instance();
         $atts = array(
             'field' => $field_group,
@@ -64,10 +66,10 @@ if (!function_exists('car_display_repeater')) {
     }
 }
 
-if (!function_exists('car_get_field_groups')) {
-    function car_get_field_groups() {
+if (!function_exists('carf_get_field_groups')) {
+    function carf_get_field_groups() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         return $wpdb->get_results("SELECT * FROM $table_name ORDER BY name ASC");
     }
 }
@@ -128,4 +130,37 @@ if (!function_exists('urf_get_repeater_with_labels')) {
 
         return $formatted_data;
     }
+}
+
+// Check for updates
+add_filter('site_transient_update_plugins', 'carf_check_for_update');
+
+function carf_check_for_update($transient) {
+    if (empty($transient->checked)) {
+        return $transient;
+    }
+
+    // URL to your info.json file from Step 1
+    $remote_url = 'https://gitlab.com/public-group203419/repeater-field-wordpress-plugin/-/raw/main/info.json'; 
+    
+    $response = wp_remote_get($remote_url);
+
+    if (!is_wp_error($response) && wp_remote_retrieve_response_code($response) == 200) {
+        $data = json_decode(wp_remote_retrieve_body($response));
+        
+        // If the version in the JSON is higher than the current plugin version
+        if ($data && version_compare(carf_VERSION, $data->version, '<')) {
+            $plugin_slug = plugin_basename(__FILE__); // custom-advance-repeater/custom-advance-repeater.php
+            
+            $obj = new stdClass();
+            $obj->slug = 'custom-advance-repeater';
+            $obj->plugin = $plugin_slug;
+            $obj->new_version = $data->version;
+            $obj->package = $data->download_url; // The link to the ZIP file
+            
+            $transient->response[$plugin_slug] = $obj;
+        }
+    }
+    
+    return $transient;
 }

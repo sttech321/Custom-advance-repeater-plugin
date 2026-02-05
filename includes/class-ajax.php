@@ -4,12 +4,12 @@ if (!defined('ABSPATH')) { exit; }
 class Custom_Advance_Repeater_Ajax {
 
     public function __construct() {
-        add_action('wp_ajax_car_get_field_group', array($this, 'ajax_get_field_group'));
-        add_action('wp_ajax_car_get_pages', array($this, 'ajax_get_pages'));
+        add_action('wp_ajax_carf_get_field_group', array($this, 'ajax_get_field_group'));
+        add_action('wp_ajax_carf_get_pages', array($this, 'ajax_get_pages'));
     }
 
     public function ajax_get_field_group() {
-        if (!check_ajax_referer('car_ajax_nonce', 'nonce', false)) {
+        if (!check_ajax_referer('carf_ajax_nonce', 'nonce', false)) {
             wp_die('Security check failed');
         }
         
@@ -26,7 +26,7 @@ class Custom_Advance_Repeater_Ajax {
     }
     
     public function ajax_get_pages() {
-        if (!check_ajax_referer('car_ajax_nonce', 'nonce', false)) {
+        if (!check_ajax_referer('carf_ajax_nonce', 'nonce', false)) {
             wp_die('Security check failed');
         }
         

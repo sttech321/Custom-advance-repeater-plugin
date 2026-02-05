@@ -1,8 +1,8 @@
-.car-frontend-output {
+.carf-frontend-output {
     margin: 40px 0;
 }
 
-.car-frontend-field-group {
+.carf-frontend-field-group {
     margin-bottom: 40px;
     padding: 30px;
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -14,7 +14,7 @@
     border-left: 5px solid #667eea;
 }
 
-.car-frontend-field-group h3 {
+.carf-frontend-field-group h3 {
     margin-top: 0;
     margin-bottom: 25px;
     padding-bottom: 15px;
@@ -24,20 +24,20 @@
     font-weight: 700;
 }
 
-.car-frontend-field {
+.carf-frontend-field {
     margin-bottom: 25px;
     padding-bottom: 25px;
     border-bottom: 2px dashed #e2e8f0;
     position: relative;
 }
 
-.car-frontend-field:last-child {
+.carf-frontend-field:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
 }
 
-.car-frontend-label {
+.carf-frontend-label {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -50,7 +50,7 @@
     position: relative;
 }
 
-.car-frontend-label::before {
+.carf-frontend-label::before {
     content: '';
     display: inline-block;
     width: 8px;
@@ -66,7 +66,7 @@
     100% { opacity: 1; }
 }
 
-.car-frontend-value {
+.carf-frontend-value {
     font-size: 16px;
     line-height: 1.8;
     color: #475569;
@@ -74,7 +74,7 @@
     position: relative;
 }
 
-.car-frontend-value::before {
+.carf-frontend-value::before {
     content: '→';
     position: absolute;
     left: 0;
@@ -82,7 +82,7 @@
     font-weight: bold;
 }
 
-.car-frontend-value img {
+.carf-frontend-value img {
     max-width: 100%;
     height: auto;
     border-radius: 12px;
@@ -91,7 +91,7 @@
     transition: all 0.3s ease;
 }
 
-.car-frontend-nested-repeater {
+.carf-frontend-nested-repeater {
     margin-top: 20px;
     padding: 25px;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -100,7 +100,7 @@
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
 }
 
-.car-frontend-nested-row {
+.carf-frontend-nested-row {
     padding: 20px;
     margin-bottom: 15px;
     background: white;
@@ -112,12 +112,12 @@
     overflow: hidden;
 }
 
-.car-frontend-nested-row:hover {
+.carf-frontend-nested-row:hover {
     transform: translateX(5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
 }
 
-.car-frontend-nested-field {
+.carf-frontend-nested-field {
     margin-bottom: 15px;
     padding-bottom: 15px;
     border-bottom: 1px solid #f1f5f9;
@@ -126,13 +126,13 @@
     gap: 15px;
 }
 
-.car-frontend-nested-field:last-child {
+.carf-frontend-nested-field:last-child {
     margin-bottom: 0;
     padding-bottom: 0;
     border-bottom: none;
 }
 
-.car-frontend-nested-field strong {
+.carf-frontend-nested-field strong {
     min-width: 140px;
     color: #1e293b;
     font-weight: 600;
@@ -146,26 +146,26 @@
 }
 
 @media (max-width: 768px) {
-    .car-frontend-field-group {
+    .carf-frontend-field-group {
         padding: 20px;
         margin-bottom: 25px;
     }
     
-    .car-frontend-field {
+    .carf-frontend-field {
         margin-bottom: 20px;
         padding-bottom: 20px;
     }
     
-    .car-frontend-label {
+    .carf-frontend-label {
         font-size: 16px;
     }
     
-    .car-frontend-value {
+    .carf-frontend-value {
         font-size: 15px;
         padding-left: 15px;
     }
     
-    .car-frontend-nested-field {
+    .carf-frontend-nested-field {
         flex-direction: column;
         gap: 8px;
     }

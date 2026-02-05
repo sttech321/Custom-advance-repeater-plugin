@@ -5,11 +5,11 @@ class Custom_Advance_Repeater_Frontend {
 
     public function __construct() {
         add_action('wp_enqueue_scripts', array($this, 'frontend_enqueue_scripts'));
-        add_shortcode('car_repeater', array($this, 'repeater_shortcode'));
+        add_shortcode('carf_repeater', array($this, 'repeater_shortcode'));
     }
 
     public function frontend_enqueue_scripts() {
-        wp_enqueue_style('car-frontend-css', CAR_PLUGIN_URL . 'assets/css/frontend.css', array(), CAR_VERSION);
+        wp_enqueue_style('carf-frontend-css', carf_PLUGIN_URL . 'assets/css/frontend.css', array(), carf_VERSION);
     }
 
     public function repeater_shortcode($atts) {
@@ -21,15 +21,15 @@ class Custom_Advance_Repeater_Frontend {
         ), $atts);
         
         if (empty($atts['field'])) {
-            return '<div class="car-error">' . __('Please specify a field name', 'custom-advance-repeater') . '</div>';
+            return '<div class="carf-error">' . __('Please specify a field name', 'custom-advance-repeater') . '</div>';
         }
         
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         $group = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE slug = %s", $atts['field']));
         
         if (!$group) {
-            return '<div class="car-error">' . __('Field group not found!', 'custom-advance-repeater') . '</div>';
+            return '<div class="carf-error">' . __('Field group not found!', 'custom-advance-repeater') . '</div>';
         }
         
         // Use Core singleton to access Admin methods for display checks
@@ -48,8 +48,8 @@ class Custom_Advance_Repeater_Frontend {
         
         ob_start();
         ?>
-        <div class="car-frontend-output">
-            <div class="car-frontend-field-group">
+        <div class="carf-frontend-output">
+            <div class="carf-frontend-field-group">
                 <h3><?php echo esc_html($group->name); ?></h3>
                 
                 <?php foreach ($fields as $field): 
@@ -62,14 +62,14 @@ class Custom_Advance_Repeater_Frontend {
                     
                     if ($field['type'] === 'repeater') {
                         ?>
-                        <div class="car-frontend-field car-nested-repeater-field">
-                            <div class="car-frontend-label"><?php echo esc_html($field['label']); ?></div>
-                            <div class="car-frontend-nested-repeater">
+                        <div class="carf-frontend-field carf-nested-repeater-field">
+                            <div class="carf-frontend-label"><?php echo esc_html($field['label']); ?></div>
+                            <div class="carf-frontend-nested-repeater">
                                 <?php 
                                 if (is_array($field_value)) {
                                     foreach ($field_value as $nested_index => $nested_row) {
                                         ?>
-                                        <div class="car-frontend-nested-row">
+                                        <div class="carf-frontend-nested-row">
                                             <?php 
                                             $subfields = $field['subfields'] ?? array();
                                             foreach ($subfields as $subfield) {
@@ -78,7 +78,7 @@ class Custom_Advance_Repeater_Frontend {
                                                     continue;
                                                 }
                                                 ?>
-                                                <div class="car-frontend-nested-field">
+                                                <div class="carf-frontend-nested-field">
                                                     <strong><?php echo esc_html($subfield['label']); ?>:</strong>
                                                     <?php echo $this->format_field_value($subfield, $subfield_value); ?>
                                                 </div>
@@ -95,9 +95,9 @@ class Custom_Advance_Repeater_Frontend {
                         <?php
                     } else {
                         ?>
-                        <div class="car-frontend-field">
-                            <div class="car-frontend-label"><?php echo esc_html($field['label']); ?></div>
-                            <div class="car-frontend-value">
+                        <div class="carf-frontend-field">
+                            <div class="carf-frontend-label"><?php echo esc_html($field['label']); ?></div>
+                            <div class="carf-frontend-value">
                                 <?php echo $this->format_field_value($field, $field_value); ?>
                             </div>
                         </div>
@@ -117,14 +117,16 @@ class Custom_Advance_Repeater_Frontend {
         if (is_array($value)) {
             if ($field_type === 'checkbox') {
                 $options_string = $field['options'] ?? '';
+                $result = [];
+
                 if (!empty($options_string)) {
                     $lines = explode("\n", $options_string);
-                    $options_map = array();
-                    
+                    $options_map = [];
+
                     foreach ($lines as $line) {
                         $line = trim($line);
                         if (empty($line)) continue;
-                        
+
                         if (strpos($line, '|') !== false) {
                             list($val, $label) = explode('|', $line, 2);
                             $options_map[trim($val)] = trim($label);
@@ -132,23 +134,21 @@ class Custom_Advance_Repeater_Frontend {
                             $options_map[trim($line)] = trim($line);
                         }
                     }
-                    
-                    $labels = array();
+
                     foreach ($value as $val) {
                         $val = trim($val);
-                        if (isset($options_map[$val])) {
-                            $labels[] = $options_map[$val];
-                        } else {
-                            $labels[] = $val;
-                        }
+                        $result[] = $options_map[$val] ?? $val;
                     }
-                    return implode(', ', $labels);
+
+                    return $result; // ✅ ARRAY
                 }
-                return implode(', ', $value);
+
+                return $value; // ✅ ARRAY
             }
-            
+
             $value = !empty($value) ? reset($value) : '';
         }
+
         
         if (!in_array($field_type, ['select', 'checkbox', 'radio'])) {
             if ($field_type === 'image' && !empty($value)) {

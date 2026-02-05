@@ -1,10 +1,10 @@
 <?php
 if (!defined('ABSPATH')) { exit; }
 
-require_once CAR_PLUGIN_DIR . 'includes/class-database.php';
-require_once CAR_PLUGIN_DIR . 'includes/class-admin.php';
-require_once CAR_PLUGIN_DIR . 'includes/class-frontend.php';
-require_once CAR_PLUGIN_DIR . 'includes/class-ajax.php';
+require_once carf_PLUGIN_DIR . 'includes/class-database.php';
+require_once carf_PLUGIN_DIR . 'includes/class-admin.php';
+require_once carf_PLUGIN_DIR . 'includes/class-frontend.php';
+require_once carf_PLUGIN_DIR . 'includes/class-ajax.php';
 
 class Custom_Advance_Repeater_Core {
     
@@ -60,15 +60,15 @@ class Custom_Advance_Repeater_Core {
     }
 
     public function add_image_sizes() {
-        add_image_size('car_thumbnail', 150, 150, true);
+        add_image_size('carf_thumbnail', 150, 150, true);
     }
     
     public function check_version() {
-        $installed_version = get_option('car_version', '0');
+        $installed_version = get_option('carf_version', '0');
         
-        if (version_compare($installed_version, CAR_VERSION, '<')) {
+        if (version_compare($installed_version, carf_VERSION, '<')) {
             $this->db->upgrade_database();
-            update_option('car_version', CAR_VERSION);
+            update_option('carf_version', carf_VERSION);
         }
     }
 

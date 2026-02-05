@@ -6,7 +6,7 @@ class Custom_Advance_Repeater_Database {
     public function upgrade_database() {
         global $wpdb;
         
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         
         // Check if pages column exists
         $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
@@ -31,7 +31,7 @@ class Custom_Advance_Repeater_Database {
     public function check_and_update_database() {
         global $wpdb;
         
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         
         $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
         if (!$table_exists) {
@@ -59,7 +59,7 @@ class Custom_Advance_Repeater_Database {
         $charset_collate = $wpdb->get_charset_collate();
         
         // Main fields table
-        $table_name = $wpdb->prefix . 'car_fields';
+        $table_name = $wpdb->prefix . 'carf_fields';
         
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -81,7 +81,7 @@ class Custom_Advance_Repeater_Database {
         ) $charset_collate;";
         
         // Field groups table
-        $table_groups = $wpdb->prefix . 'car_field_groups';
+        $table_groups = $wpdb->prefix . 'carf_field_groups';
         
         $sql2 = "CREATE TABLE IF NOT EXISTS $table_groups (
             id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -102,13 +102,13 @@ class Custom_Advance_Repeater_Database {
         
         $this->check_and_update_database();
         
-        update_option('car_version', CAR_VERSION);
-        update_option('car_installed', time());
+        update_option('carf_version', carf_VERSION);
+        update_option('carf_installed', time());
     }
 
     public function save_field_group() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         
         $this->check_and_update_database();
         
@@ -346,13 +346,13 @@ class Custom_Advance_Repeater_Database {
 
     public function get_field_group($id) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id));
     }
 
     public function get_field_group_by_slug($slug) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_field_groups';
+        $table_name = $wpdb->prefix . 'carf_field_groups';
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE slug = %s", $slug));
     }
 
@@ -365,20 +365,20 @@ class Custom_Advance_Repeater_Database {
         $core->log('=============================================');
         
         if (
-            !isset($_POST['car_field_group']) ||
-            !is_array($_POST['car_field_group']) ||
-            !isset($_POST['car_data'])
+            !isset($_POST['carf_field_group']) ||
+            !is_array($_POST['carf_field_group']) ||
+            !isset($_POST['carf_data'])
         ) {
-            $core->log('ERROR: No car_field_group or car_data in POST');
+            $core->log('ERROR: No carf_field_group or carf_data in POST');
             return;
         }
 
         $core->log('POST data keys: ' . print_r(array_keys($_POST), true));
-        $core->log('car_field_group: ' . print_r($_POST['car_field_group'], true));
+        $core->log('carf_field_group: ' . print_r($_POST['carf_field_group'], true));
         
-        if (isset($_POST['car_data'])) {
-            $core->log('car_data structure preview:');
-            foreach ($_POST['car_data'] as $group => $data) {
+        if (isset($_POST['carf_data'])) {
+            $core->log('carf_data structure preview:');
+            foreach ($_POST['carf_data'] as $group => $data) {
                 $core->log('  Group: ' . $group);
                 if (is_array($data)) {
                     foreach ($data as $field => $value) {
@@ -401,11 +401,11 @@ class Custom_Advance_Repeater_Database {
         }
 
         // Verify nonces
-        foreach ($_POST['car_field_group'] as $group_slug) {
-            $nonce_key = 'car_nonce_' . $group_slug;
+        foreach ($_POST['carf_field_group'] as $group_slug) {
+            $nonce_key = 'carf_nonce_' . $group_slug;
             if (
                 empty($_POST[$nonce_key]) ||
-                !wp_verify_nonce($_POST[$nonce_key], 'car_save_fields_' . $group_slug)
+                !wp_verify_nonce($_POST[$nonce_key], 'carf_save_fields_' . $group_slug)
             ) {
                 $core->log('ERROR: Nonce verification failed for group: ' . $group_slug);
                 return;
@@ -413,13 +413,13 @@ class Custom_Advance_Repeater_Database {
         }
 
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_fields';
+        $table_name = $wpdb->prefix . 'carf_fields';
 
         // Get field groups to identify image fields
-        $group_table = $wpdb->prefix . 'car_field_groups';
+        $group_table = $wpdb->prefix . 'carf_field_groups';
         $image_fields = [];
         
-        foreach ($_POST['car_field_group'] as $group_slug) {
+        foreach ($_POST['carf_field_group'] as $group_slug) {
             $group = $wpdb->get_row($wpdb->prepare(
                 "SELECT * FROM {$group_table} WHERE slug = %s",
                 $group_slug
@@ -437,13 +437,13 @@ class Custom_Advance_Repeater_Database {
             }
         }
 
-        $core->log('Processing ' . count($_POST['car_data']) . ' field groups');
+        $core->log('Processing ' . count($_POST['carf_data']) . ' field groups');
         
         // Process each field group
-        foreach ($_POST['car_data'] as $group_slug => $data) {
+        foreach ($_POST['carf_data'] as $group_slug => $data) {
             $core->log('--- Processing Group: ' . $group_slug . ' ---');
             
-            if (!in_array($group_slug, $_POST['car_field_group'], true)) {
+            if (!in_array($group_slug, $_POST['carf_field_group'], true)) {
                 $core->log('Skipping: Group not in allowed list');
                 continue;
             }
@@ -775,7 +775,7 @@ class Custom_Advance_Repeater_Database {
 
     public function get_single_field_values($post_id, $group_slug) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_fields';
+        $table_name = $wpdb->prefix . 'carf_fields';
         
         $results = $wpdb->get_results($wpdb->prepare(
             "SELECT field_name, field_value FROM $table_name 
@@ -795,9 +795,9 @@ class Custom_Advance_Repeater_Database {
 
     public function get_field_data($post_id, $group_slug) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_fields';
+        $table_name = $wpdb->prefix . 'carf_fields';
 
-        $group_table = $wpdb->prefix . 'car_field_groups';
+        $group_table = $wpdb->prefix . 'carf_field_groups';
         $group = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $group_table WHERE slug = %s",
             $group_slug
@@ -916,7 +916,7 @@ class Custom_Advance_Repeater_Database {
 
     public function debug_database_state($post_id) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'car_fields';
+        $table_name = $wpdb->prefix . 'carf_fields';
         
         $core = Custom_Advance_Repeater_Core::get_instance();
 
