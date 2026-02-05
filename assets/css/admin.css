@@ -1,0 +1,807 @@
+/* Calendar fix styles */
+.ui-datepicker {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 10px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    width: 300px !important;
+    z-index: 100001 !important;
+}
+
+.ui-datepicker-header {
+    background: #f8f9fa;
+    border: none;
+    border-radius: 3px;
+    padding: 8px 0;
+    margin-bottom: 8px;
+}
+
+.ui-datepicker-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #23282d;
+}
+
+.ui-datepicker-prev,
+.ui-datepicker-next {
+    cursor: pointer;
+    top: 8px !important;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: white;
+}
+
+.ui-datepicker-prev:hover,
+.ui-datepicker-next:hover {
+    background: #f1f1f1;
+}
+
+.ui-datepicker-prev span,
+.ui-datepicker-next span {
+    display: none;
+}
+
+.ui-datepicker-prev:before {
+    content: "←";
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    color: #555;
+}
+
+.ui-datepicker-next:before {
+    content: "→";
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    color: #555;
+}
+
+.ui-datepicker-calendar {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0;
+}
+
+.ui-datepicker-calendar th {
+    padding: 8px 0;
+    font-size: 12px;
+    font-weight: 600;
+    color: #666;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.ui-datepicker-calendar td {
+    padding: 5px;
+    text-align: center;
+}
+
+.ui-datepicker-calendar td a {
+    display: block;
+    padding: 8px;
+    text-decoration: none;
+    color: #23282d;
+    border-radius: 3px;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+}
+
+.ui-datepicker-calendar td a:hover {
+    background: #0073aa;
+    border-color: #ddd;
+    color: #fff;
+}
+
+.ui-datepicker-calendar td .ui-state-active {
+    background: #0073aa;
+    color: white;
+    border-color: #0073aa;
+}
+
+.ui-datepicker-calendar td .ui-state-highlight {
+    background: #f0f8ff;
+    color: #0073aa;
+    border-color: #b3d9ff;
+}
+
+.ui-datepicker-calendar td .ui-state-default {
+    border: 1px solid #e0e0e0;
+}
+
+.ui-datepicker-calendar td.ui-datepicker-other-month a {
+    color: #a0a0a0;
+    background: #f9f9f9;
+}
+
+.ui-datepicker-buttonpane {
+    border-top: 1px solid #eee;
+    padding: 10px 0 0;
+    margin-top: 10px;
+}
+
+.ui-datepicker-current,
+.ui-datepicker-close {
+    padding: 6px 12px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    background: #f7f7f7;
+    color: #23282d;
+    cursor: pointer;
+}
+
+.ui-datepicker-current:hover,
+.ui-datepicker-close:hover {
+    background: #f0f0f0;
+    border-color: #ccc;
+}
+
+.ui-datepicker-today a {
+    background: #f7f7f7 !important;
+    border-color: #ddd !important;
+    font-weight: bold;
+}
+
+/* Make sure calendar appears above everything */
+.ui-datepicker.ui-widget.ui-widget-content {
+    z-index: 100001 !important;
+    position: absolute !important;
+}
+
+.ui-datepicker.ui-widget {
+    font-family: inherit !important;
+}
+
+/* Fix for nested datepickers */
+.car-nested-table .ui-datepicker {
+    width: 280px !important;
+    font-size: 12px !important;
+}
+
+.car-nested-table .ui-datepicker-calendar td a {
+    padding: 6px !important;
+    font-size: 11px !important;
+}
+
+.car-nested-table .ui-datepicker-calendar th {
+    padding: 6px 0 !important;
+    font-size: 11px !important;
+}
+
+.ui-datepicker select.ui-datepicker-month,
+.ui-datepicker select.ui-datepicker-year {
+    height: 28px;
+    padding: 3px;
+    font-size: 12px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    background: white;
+    color: #23282d;
+}
+
+/* Ensure proper positioning */
+.ui-datepicker.ui-widget-content {
+    z-index: 999999 !important;
+    position: absolute;
+}
+
+/* Fix for datepicker in tables */
+.car-nested-table .hasDatepicker {
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* Additional Custom Advance Repeater styles */
+.car-field-group {
+    margin: 25px 0;
+    overflow: hidden;
+    /* background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e0e6ed;
+    padding: 25px; */
+}
+
+.car-field-group h2 {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 18px 20px;
+    margin: -25px -25px 25px -25px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    position: relative;
+}
+
+.car-vertical-fields {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 12px;
+    padding: 25px;
+    border: 1px solid #e2e8f0;
+    margin: 0;
+    display: block;
+    position: relative;
+    overflow: hidden;
+}
+
+.car-vertical-fields::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea, #764ba2, #4CAF50);
+    background-size: 300% 100%;
+    animation: gradientAnimation 3s ease infinite;
+}
+
+@keyframes gradientAnimation {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.car-vertical-field {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.car-vertical-field:last-child {
+    margin-bottom: 0;
+}
+
+.car-vertical-field:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border-color: #cbd5e1;
+}
+
+.car-vertical-field::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(to bottom, #667eea, #764ba2);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.car-vertical-field:hover::after {
+    opacity: 1;
+}
+
+.car-vertical-field label {
+    display: block;
+    font-weight: 700;
+    font-size: 15px;
+    color: #1e293b;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.car-vertical-field label::before {
+    content: '📋';
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+.car-vertical-field input[type="text"],
+.car-vertical-field textarea,
+.car-vertical-field select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 14px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.3s ease;
+    background: white;
+    color: #334155;
+}
+
+.car-vertical-field input[type="text"]:focus,
+.car-vertical-field textarea:focus,
+.car-vertical-field select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    background: #f8fafc;
+}
+
+.car-vertical-field textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.car-file-upload-container {
+    margin-top: 10px;
+}
+
+.car-upload-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    color: white !important;
+    border: none !important;
+    padding: 12px 24px !important;
+    border-radius: 8px !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
+}
+
+.car-upload-button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+}
+
+.car-file-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.car-file-item {
+    position: relative;
+    border: 2px solid #e2e8f0;
+    padding: 10px;
+    background: white;
+    border-radius: 10px;
+    max-width: 180px;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+}
+
+.car-file-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.car-image-preview {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
+}
+
+.car-remove-file {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff4757;
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    text-align: center;
+    line-height: 24px;
+    cursor: pointer;
+    font-size: 12px;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* NESTED REPEATER STYLES */
+.car-nested-repeater {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    padding: 20px;
+    border-radius: 12px;
+    margin-top: 15px;
+    border: 1px solid #e2e8f0;
+    position: relative;
+    overflow: hidden;
+}
+
+/* LEVEL 1 TABLE STYLES */
+.car-nested-table {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+
+.car-nested-table th {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%) !important;
+    color: white;
+    padding: 14px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    border-bottom: 2px solid #3d8b40;
+}
+
+.car-nested-table td {
+    padding: 12px;
+    background: white;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: top;
+    position: relative;
+}
+
+.car-nested-table tr:last-child td {
+    border-bottom: none;
+}
+
+.car-nested-table tr:hover td {
+    background-color: #f8fafc;
+}
+
+.car-row-handle {
+    width: 60px;
+    text-align: center;
+    cursor: move;
+    background: linear-gradient(135deg, #f6f8ff 0%, #f0f4ff 100%);
+    vertical-align: middle;
+    border-right: 1px solid #f0f4f8;
+}
+
+.car-row-actions {
+    width: 80px;
+    text-align: center;
+    background: linear-gradient(135deg, #f6f8ff 0%, #f0f4ff 100%);
+    vertical-align: middle;
+    border-left: 1px solid #f0f4f8;
+}
+
+/* LEVEL 2 NESTED REPEATER STYLES */
+.car-nested-repeater .car-nested-repeater {
+    background: linear-gradient(135deg, #f1f8ff 0%, #e8f4ff 100%);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #dbeafe;
+    margin: 10px 0;
+}
+
+.car-nested-repeater .car-nested-table {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.car-nested-repeater .car-nested-table th {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    padding: 12px 10px;
+    font-size: 13px;
+    border-bottom: 2px solid #1d4ed8;
+}
+
+.car-nested-repeater .car-nested-table td {
+    padding: 10px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* FIX FOR INPUTS IN TABLES */
+.car-nested-table input[type="text"],
+.car-nested-table textarea,
+.car-nested-table select,
+.car-nested-table .car-file-upload-container,
+.car-nested-table .car-upload-button,
+.car-nested-table .car-colorpicker,
+.car-nested-table .car-datepicker {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    display: block !important;
+}
+
+.car-nested-table input[type="text"],
+.car-nested-table textarea,
+.car-nested-table select {
+    padding: 10px 12px !important;
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 6px !important;
+    font-size: 14px !important;
+    background: white !important;
+    min-height: 44px !important;
+}
+
+.car-nested-table textarea {
+    min-height: 80px !important;
+    resize: vertical !important;
+}
+
+.car-nested-table .car-file-upload-container {
+    margin-top: 5px !important;
+}
+
+.car-nested-table .car-upload-button {
+    padding: 8px 16px !important;
+    font-size: 13px !important;
+    margin-top: 5px !important;
+}
+
+.car-nested-table .car-colorpicker {
+    height: 44px !important;
+}
+
+.car-nested-table .car-datepicker {
+    cursor: pointer !important;
+}
+
+/* FILE PREVIEWS IN TABLES */
+.car-nested-table .car-file-preview {
+    margin: 10px 0 5px 0 !important;
+}
+
+.car-nested-table .car-file-item {
+    max-width: 150px !important;
+    margin: 5px 0 !important;
+    padding: 8px !important;
+}
+
+.car-nested-table .car-image-preview {
+    max-height: 100px !important;
+}
+
+/* ADD ROW BUTTONS */
+.car-add-nested-row,
+.car-add-nested2-row {
+    margin: 15px 0 10px !important;
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+    cursor: pointer !important;
+}
+
+.car-add-nested-row {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
+}
+
+.car-add-nested2-row {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+    color: white !important;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
+}
+
+.car-add-nested-row:hover,
+.car-add-nested2-row:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* SORTABLE AND DRAG HANDLES */
+.car-row-handle {
+    width: 50px;
+    text-align: center;
+    cursor: move;
+    position: relative;
+}
+
+.car-row-handle .dashicons-menu {
+    color: #94a3b8;
+    font-size: 20px;
+}
+
+.car-row-handle:hover .dashicons-menu {
+    color: #64748b;
+}
+
+.car-sortable-placeholder {
+    background: #f0f4ff !important;
+    border: 2px dashed #667eea !important;
+    height: 60px !important;
+    opacity: 0.7;
+}
+
+/* REMOVE BUTTONS */
+.car-remove-nested-row,
+.car-remove-nested2-row {
+    color: #dc2626 !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    display: inline-block !important;
+    padding: 5px !important;
+    border-radius: 4px !important;
+    transition: all 0.2s ease !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.car-remove-nested-row:hover,
+.car-remove-nested2-row:hover {
+    color: #b91c1c !important;
+    background: #fee2e2 !important;
+    transform: scale(1.1);
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 1200px) {
+    .car-nested-table-container {
+        overflow-x: auto;
+    }
+    
+    .car-nested-table {
+        min-width: 800px;
+    }
+}
+
+@media (max-width: 768px) {
+    .car-field-group {
+        padding: 15px;
+        margin: 15px 0;
+    }
+    
+    .car-vertical-fields {
+        padding: 15px;
+    }
+    
+    .car-vertical-field {
+        padding: 15px;
+    }
+    
+    .car-nested-repeater {
+        padding: 15px;
+    }
+    
+    .car-add-nested-row,
+    .car-add-nested2-row {
+        padding: 8px 16px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* FIX FOR NESTED2 IN TABLES - SPECIFIC FIX */
+.car-nested-repeater .car-nested-table td .car-nested-repeater {
+    margin: 10px 0 0 0 !important;
+    padding: 12px !important;
+}
+
+.car-nested-repeater .car-nested-table .car-add-nested2-row {
+    margin: 10px 0 5px 0 !important;
+    padding: 8px 16px !important;
+    font-size: 12px !important;
+}
+
+/* Ensure proper cell widths */
+.car-nested-table th:first-child,
+.car-nested-table td:first-child {
+    width: 60px;
+    min-width: 60px;
+    max-width: 60px;
+}
+
+.car-nested-table th:last-child,
+.car-nested-table td:last-child {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+}
+
+/* Fix for nested tables inside table cells */
+.nested-field-wrapper {
+    min-width: 200px;
+    position: relative;
+}
+
+/* Row index styling */
+.nested-row-index,
+.nested2-row-index {
+    font-weight: 600;
+    color: #475569;
+    font-size: 13px;
+}
+
+/* Hover effects for better UX */
+.car-nested-tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.car-nested-tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+/* Color picker fix */
+.car-nested-table .wp-picker-container {
+    width: 100% !important;
+}
+
+.car-nested-table .wp-picker-input-wrap {
+    width: 100% !important;
+}
+
+.car-nested-table .wp-picker-input-wrap input[type="text"] {
+    width: 100% !important;
+}
+
+/* Date picker fix - Enhanced */
+.car-nested-table .hasDatepicker {
+    background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>') no-repeat right 10px center !important;
+    background-size: 20px !important;
+    padding-right: 40px !important;
+    cursor: pointer !important;
+}
+
+/* Fix for datepicker in nested tables */
+.car-nested-table .ui-datepicker {
+    font-size: 13px !important;
+    min-width: 280px !important;
+}
+
+.car-nested-table .ui-datepicker-calendar th {
+    padding: 6px 0 !important;
+    font-size: 11px !important;
+}
+
+.car-nested-table .ui-datepicker-calendar td a {
+    padding: 6px !important;
+    font-size: 11px !important;
+}
+/* ---------- Advanced Fields Design Starts Here ------- */
+#car-fields-container .inner_colm input:not([type="submit"]), #car-fields-container .inner_colm select {
+    display: block !important;
+    width: 100%;
+    max-width: 100%;
+    margin: 6px 0 0 0;
+    padding: 4px 8px;
+    line-height: 2;
+    min-height: 30px;
+}
+.selected_pages_container .selected-page {
+    display: inline-block;
+    padding: 6px 8px !important;
+}
+
+.selected_pages_container .selected-page:not(:first-child) {
+    margin-left: 10px;
+}
+.panel_row .top_right_panel {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.add_field_btn { margin: 6px 0 0 !important;display: inline-flex !important;align-items: center;justify-content: center;gap: 6px;font-size: 13px !important;}
+
+.add_field_btn span {height: 18px;}
+/* ---------- Advanced Fields Design Ends Here ------- */
