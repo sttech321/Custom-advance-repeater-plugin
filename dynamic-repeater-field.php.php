@@ -1,10 +1,10 @@
 <?php
 /*
-Plugin Name: Ultimate Repeater Field
+Plugin Name: Custom Advance Repeater
 Description: A WordPress plugin that allows you to manage dynamic repeater fields with various field types, including nested repeaters.
 Version: 1.6.0
 Author: Supreme
-Text Domain: ultimate-repeater-field
+Text Domain: custom-advance-repeater
 Domain Path: /languages
 */
 
@@ -14,12 +14,12 @@ if (!defined('ABSPATH')) {
 }
 
 // Define plugin constants
-define('URF_VERSION', '1.6.0');
-define('URF_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('URF_PLUGIN_URL', plugin_dir_url(__FILE__));
+define('CAR_VERSION', '1.6.0');
+define('CAR_PLUGIN_DIR', plugin_dir_path(__FILE__));
+define('CAR_PLUGIN_URL', plugin_dir_url(__FILE__));
 
 // Main Plugin Class
-class Ultimate_Repeater_Field {
+class Custom_Advance_Repeater {
     
     private static $instance = null;
     
@@ -49,12 +49,12 @@ class Ultimate_Repeater_Field {
         add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
         
         // AJAX handlers
-        add_action('wp_ajax_urf_get_field_group', array($this, 'ajax_get_field_group'));
-        add_action('wp_ajax_urf_get_pages', array($this, 'ajax_get_pages'));
+        add_action('wp_ajax_car_get_field_group', array($this, 'ajax_get_field_group'));
+        add_action('wp_ajax_car_get_pages', array($this, 'ajax_get_pages'));
         
         // Frontend
         add_action('wp_enqueue_scripts', array($this, 'frontend_enqueue_scripts'));
-        add_shortcode('urf_repeater', array($this, 'repeater_shortcode'));
+        add_shortcode('car_repeater', array($this, 'repeater_shortcode'));
         
         // Save post hook
         add_action('save_post', array($this, 'save_post_data'), 10, 3);
@@ -64,22 +64,22 @@ class Ultimate_Repeater_Field {
     }
     
     public function add_image_sizes() {
-        add_image_size('urf_thumbnail', 150, 150, true);
+        add_image_size('car_thumbnail', 150, 150, true);
     }
     
     public function check_version() {
-        $installed_version = get_option('urf_version', '0');
+        $installed_version = get_option('car_version', '0');
         
-        if (version_compare($installed_version, URF_VERSION, '<')) {
+        if (version_compare($installed_version, CAR_VERSION, '<')) {
             $this->upgrade_database();
-            update_option('urf_version', URF_VERSION);
+            update_option('car_version', CAR_VERSION);
         }
     }
 
     public function upgrade_database() {
         global $wpdb;
         
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         
         // Check if pages column exists
         $columns = $wpdb->get_results("SHOW COLUMNS FROM $table_name");
@@ -104,7 +104,7 @@ class Ultimate_Repeater_Field {
     public function check_and_update_database() {
         global $wpdb;
         
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         
         $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
         if (!$table_exists) {
@@ -146,7 +146,7 @@ class Ultimate_Repeater_Field {
         $charset_collate = $wpdb->get_charset_collate();
         
         // Main fields table
-        $table_name = $wpdb->prefix . 'urf_fields';
+        $table_name = $wpdb->prefix . 'car_fields';
         
         $sql = "CREATE TABLE IF NOT EXISTS $table_name (
             id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -168,7 +168,7 @@ class Ultimate_Repeater_Field {
         ) $charset_collate;";
         
         // Field groups table
-        $table_groups = $wpdb->prefix . 'urf_field_groups';
+        $table_groups = $wpdb->prefix . 'car_field_groups';
         
         $sql2 = "CREATE TABLE IF NOT EXISTS $table_groups (
             id bigint(20) NOT NULL AUTO_INCREMENT,
@@ -189,8 +189,8 @@ class Ultimate_Repeater_Field {
         
         $this->check_and_update_database();
         
-        update_option('urf_version', URF_VERSION);
-        update_option('urf_installed', time());
+        update_option('car_version', CAR_VERSION);
+        update_option('car_installed', time());
     }
     
     public function deactivate() {
@@ -198,35 +198,35 @@ class Ultimate_Repeater_Field {
     }
     
     public function init() {
-        load_plugin_textdomain('ultimate-repeater-field', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        load_plugin_textdomain('custom-advance-repeater', false, dirname(plugin_basename(__FILE__)) . '/languages');
     }
     
     public function add_admin_menu() {
         add_menu_page(
-            __('Ultimate Repeater', 'ultimate-repeater-field'),
-            __('Ultimate Repeater', 'ultimate-repeater-field'),
+            __('Custom Advance Repeater', 'custom-advance-repeater'),
+            __('Custom Advance Repeater', 'custom-advance-repeater'),
             'manage_options',
-            'ultimate-repeater',
+            'custom-advance-repeater',
             array($this, 'admin_dashboard'),
             'dashicons-list-view',
             30
         );
         
         add_submenu_page(
-            'ultimate-repeater',
-            __('Field Groups', 'ultimate-repeater-field'),
-            __('Field Groups', 'ultimate-repeater-field'),
+            'custom-advance-repeater',
+            __('Field Groups', 'custom-advance-repeater'),
+            __('Field Groups', 'custom-advance-repeater'),
             'manage_options',
-            'urf-field-groups',
+            'car-field-groups',
             array($this, 'field_groups_page')
         );
         
         add_submenu_page(
-            'ultimate-repeater',
-            __('Add New Field Group', 'ultimate-repeater-field'),
-            __('Add New', 'ultimate-repeater-field'),
+            'custom-advance-repeater',
+            __('Add New Field Group', 'custom-advance-repeater'),
+            __('Add New', 'custom-advance-repeater'),
             'manage_options',
-            'urf-add-field-group',
+            'car-add-field-group',
             array($this, 'add_field_group_page')
         );
     }
@@ -234,79 +234,77 @@ class Ultimate_Repeater_Field {
     public function admin_dashboard() {
         ?>
         <div class="wrap">
-            <h1><?php _e('Ultimate Repeater Field', 'ultimate-repeater-field'); ?></h1>
+            <h1><?php _e('Custom Advance Repeater', 'custom-advance-repeater'); ?></h1>
             
-            <div class="urf-dashboard">
-                <div class="urf-card">
-                    <h2><?php _e('Getting Started', 'ultimate-repeater-field'); ?></h2>
+            <div class="car-dashboard">
+                <div class="car-card">
+                    <h2><?php _e('Getting Started', 'custom-advance-repeater'); ?></h2>
                     <ol>
-                        <li><?php _e('Create Field Groups with your desired fields', 'ultimate-repeater-field'); ?></li>
-                        <li><?php _e('Assign field groups to post types or specific pages', 'ultimate-repeater-field'); ?></li>
-                        <li><?php _e('Edit posts/pages to add repeater data', 'ultimate-repeater-field'); ?></li>
-                        <li><?php _e('Display data in your theme using shortcodes or functions', 'ultimate-repeater-field'); ?></li>
+                        <li><?php _e('Create Field Groups with your desired fields', 'custom-advance-repeater'); ?></li>
+                        <li><?php _e('Assign field groups to post types or specific pages', 'custom-advance-repeater'); ?></li>
+                        <li><?php _e('Edit posts/pages to add repeater data', 'custom-advance-repeater'); ?></li>
+                        <li><?php _e('Display data in your theme using shortcodes or functions', 'custom-advance-repeater'); ?></li>
                     </ol>
                 </div>
                 
-                <div class="urf-card">
-                    <h2><?php _e('Available Field Types', 'ultimate-repeater-field'); ?></h2>
+                <div class="car-card">
+                    <h2><?php _e('Available Field Types', 'custom-advance-repeater'); ?></h2>
                     <ul>
-                        <li><strong><?php _e('Text', 'ultimate-repeater-field'); ?></strong> - <?php _e('Simple text input', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Textarea', 'ultimate-repeater-field'); ?></strong> - <?php _e('Multi-line text', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Image Upload', 'ultimate-repeater-field'); ?></strong> - <?php _e('Upload images with preview', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Select Dropdown', 'ultimate-repeater-field'); ?></strong> - <?php _e('Select from options', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Checkbox', 'ultimate-repeater-field'); ?></strong> - <?php _e('Multiple checkboxes', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Radio Buttons', 'ultimate-repeater-field'); ?></strong> - <?php _e('Single selection', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Color Picker', 'ultimate-repeater-field'); ?></strong> - <?php _e('Color selection', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Date Picker', 'ultimate-repeater-field'); ?></strong> - <?php _e('Date selection', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Repeater Field', 'ultimate-repeater-field'); ?></strong> - <?php _e('Nested repeater with sub-fields', 'ultimate-repeater-field'); ?></li>
+                        <li><strong><?php _e('Text', 'custom-advance-repeater'); ?></strong> - <?php _e('Simple text input', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Textarea', 'custom-advance-repeater'); ?></strong> - <?php _e('Multi-line text', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Image Upload', 'custom-advance-repeater'); ?></strong> - <?php _e('Upload images with preview', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Select Dropdown', 'custom-advance-repeater'); ?></strong> - <?php _e('Select from options', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Checkbox', 'custom-advance-repeater'); ?></strong> - <?php _e('Multiple checkboxes', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Radio Buttons', 'custom-advance-repeater'); ?></strong> - <?php _e('Single selection', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Color Picker', 'custom-advance-repeater'); ?></strong> - <?php _e('Color selection', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Date Picker', 'custom-advance-repeater'); ?></strong> - <?php _e('Date selection', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Repeater Field', 'custom-advance-repeater'); ?></strong> - <?php _e('Nested repeater with sub-fields', 'custom-advance-repeater'); ?></li>
                     </ul>
                 </div>
                 
-                <div class="urf-card">
-                    <h2><?php _e('New in Version 1.6.0', 'ultimate-repeater-field'); ?></h2>
+                <div class="car-card">
+                    <h2><?php _e('New in Version 1.6.0', 'custom-advance-repeater'); ?></h2>
                     <ul>
-                        <li><strong><?php _e('Nested Repeater Support', 'ultimate-repeater-field'); ?></strong> - <?php _e('Repeater fields inside repeater fields', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Multi-level Nesting', 'ultimate-repeater-field'); ?></strong> - <?php _e('Support for deeply nested structures', 'ultimate-repeater-field'); ?></li>
-                        <li><strong><?php _e('Improved UI', 'ultimate-repeater-field'); ?></strong> - <?php _e('Better interface for managing nested fields', 'ultimate-repeater-field'); ?></li>
+                        <li><strong><?php _e('Nested Repeater Support', 'custom-advance-repeater'); ?></strong> - <?php _e('Repeater fields inside repeater fields', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Multi-level Nesting', 'custom-advance-repeater'); ?></strong> - <?php _e('Support for deeply nested structures', 'custom-advance-repeater'); ?></li>
+                        <li><strong><?php _e('Improved UI', 'custom-advance-repeater'); ?></strong> - <?php _e('Better interface for managing nested fields', 'custom-advance-repeater'); ?></li>
                     </ul>
                 </div>
             </div>
         </div>
         <style>
-            .urf-dashboard {
+            .car-dashboard {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
                 gap: 20px;
                 margin-top: 20px;
             }
-            .urf-card {
+            .car-card {
                 background: #fff;
                 padding: 20px;
                 border: 1px solid #ccd0d4;
                 border-radius: 4px;
                 box-shadow: 0 1px 3px rgba(0,0,0,0.1);
             }
-            .urf-card h2 {
+            .car-card h2 {
                 margin-top: 0;
                 border-bottom: 2px solid #0073aa;
                 padding-bottom: 10px;
             }
-            .urf-card ul, .urf-card ol {
+            .car-card ul, .car-card ol {
                 padding-left: 20px;
             }
-            .urf-card li {
+            .car-card li {
                 margin-bottom: 8px;
             }
-			
-
         </style>
         <?php
     }
     
     public function field_groups_page() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
-        $fields_table = $wpdb->prefix . 'urf_fields';
+        $table_name = $wpdb->prefix . 'car_field_groups';
+        $fields_table = $wpdb->prefix . 'car_fields';
         
         if (isset($_GET['delete'])) {
             $id = intval($_GET['delete']);
@@ -322,9 +320,9 @@ class Ultimate_Repeater_Field {
                     $nested_pattern
                 ));
                 
-                echo '<div class="notice notice-success"><p>' . __('Field group deleted successfully!', 'ultimate-repeater-field') . '</p></div>';
+                echo '<div class="notice notice-success"><p>' . __('Field group deleted successfully!', 'custom-advance-repeater') . '</p></div>';
             } else {
-                echo '<div class="notice notice-error"><p>' . __('Field group not found!', 'ultimate-repeater-field') . '</p></div>';
+                echo '<div class="notice notice-error"><p>' . __('Field group not found!', 'custom-advance-repeater') . '</p></div>';
             }
         }
         
@@ -332,26 +330,26 @@ class Ultimate_Repeater_Field {
         
         ?>
         <div class="wrap">
-            <h1><?php _e('Field Groups', 'ultimate-repeater-field'); ?>
-                <a href="<?php echo admin_url('admin.php?page=urf-add-field-group'); ?>" class="page-title-action">
-                    <?php _e('Add New', 'ultimate-repeater-field'); ?>
+            <h1><?php _e('Field Groups', 'custom-advance-repeater'); ?>
+                <a href="<?php echo admin_url('admin.php?page=car-add-field-group'); ?>" class="page-title-action">
+                    <?php _e('Add New', 'custom-advance-repeater'); ?>
                 </a>
             </h1>
             
             <?php if (empty($field_groups)): ?>
                 <div class="notice notice-info">
-                    <p><?php _e('No field groups found. Create your first field group!', 'ultimate-repeater-field'); ?></p>
+                    <p><?php _e('No field groups found. Create your first field group!', 'custom-advance-repeater'); ?></p>
                 </div>
             <?php else: ?>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
-                            <th><?php _e('Name', 'ultimate-repeater-field'); ?></th>
-                            <th><?php _e('Slug', 'ultimate-repeater-field'); ?></th>
-                            <th><?php _e('Post Types', 'ultimate-repeater-field'); ?></th>
-                            <th><?php _e('Specific Pages', 'ultimate-repeater-field'); ?></th>
-                            <th><?php _e('Fields Count', 'ultimate-repeater-field'); ?></th>
-                            <th><?php _e('Actions', 'ultimate-repeater-field'); ?></th>
+                            <th><?php _e('Name', 'custom-advance-repeater'); ?></th>
+                            <th><?php _e('Slug', 'custom-advance-repeater'); ?></th>
+                            <th><?php _e('Post Types', 'custom-advance-repeater'); ?></th>
+                            <th><?php _e('Specific Pages', 'custom-advance-repeater'); ?></th>
+                            <th><?php _e('Fields Count', 'custom-advance-repeater'); ?></th>
+                            <th><?php _e('Actions', 'custom-advance-repeater'); ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -366,12 +364,12 @@ class Ultimate_Repeater_Field {
                                 <td><?php 
                                     if (is_array($post_types)) {
                                         if (in_array('all', $post_types)) {
-                                            echo __('All', 'ultimate-repeater-field');
+                                            echo __('All', 'custom-advance-repeater');
                                         } else {
                                             echo implode(', ', $post_types);
                                         }
                                     } else {
-                                        echo __('All', 'ultimate-repeater-field');
+                                        echo __('All', 'custom-advance-repeater');
                                     }
                                 ?></td>
                                 <td>
@@ -386,17 +384,17 @@ class Ultimate_Repeater_Field {
                                         }
                                         echo implode(', ', $page_titles);
                                     } else {
-                                        echo __('None', 'ultimate-repeater-field');
+                                        echo __('None', 'custom-advance-repeater');
                                     }
                                     ?>
                                 </td>
                                 <td><?php echo is_array($fields) ? count($fields) : 0; ?></td>
                                 <td>
-                                    <a href="<?php echo admin_url('admin.php?page=urf-add-field-group&edit=' . $group->id); ?>" class="button button-small">
-                                        <?php _e('Edit', 'ultimate-repeater-field'); ?>
+                                    <a href="<?php echo admin_url('admin.php?page=car-add-field-group&edit=' . $group->id); ?>" class="button button-small">
+                                        <?php _e('Edit', 'custom-advance-repeater'); ?>
                                     </a>
-                                    <a href="<?php echo admin_url('admin.php?page=urf-field-groups&delete=' . $group->id); ?>" class="button button-small button-link-delete" onclick="return confirm('<?php _e('Are you sure you want to delete this field group?', 'ultimate-repeater-field'); ?>');">
-                                        <?php _e('Delete', 'ultimate-repeater-field'); ?>
+                                    <a href="<?php echo admin_url('admin.php?page=car-field-groups&delete=' . $group->id); ?>" class="button button-small button-link-delete" onclick="return confirm('<?php _e('Are you sure you want to delete this field group?', 'custom-advance-repeater'); ?>');">
+                                        <?php _e('Delete', 'custom-advance-repeater'); ?>
                                     </a>
                                 </td>
                             </tr>
@@ -415,11 +413,11 @@ class Ultimate_Repeater_Field {
     $error_message = '';
     
     if (isset($_GET['saved']) && $_GET['saved'] == '1') {
-        $success_message = '<div class="notice notice-success"><p>' . __('Field group saved successfully!', 'ultimate-repeater-field') . '</p></div>';
+        $success_message = '<div class="notice notice-success"><p>' . __('Field group saved successfully!', 'custom-advance-repeater') . '</p></div>';
     }
     
-    if (isset($_POST['save_field_group'], $_POST['urf_field_group_nonce'])) {
-        if (!wp_verify_nonce($_POST['urf_field_group_nonce'], 'urf_save_field_group')) {
+    if (isset($_POST['save_field_group'], $_POST['car_field_group_nonce'])) {
+        if (!wp_verify_nonce($_POST['car_field_group_nonce'], 'car_save_field_group')) {
             $error_message = '<div class="notice notice-error"><p>Security check failed</p></div>';
         } elseif (!current_user_can('manage_options')) {
             $error_message = '<div class="notice notice-error"><p>Permission denied</p></div>';
@@ -428,8 +426,8 @@ class Ultimate_Repeater_Field {
             
             if ($result === true) {
                 $redirect_url = !empty($_POST['group_id'])
-                    ? admin_url('admin.php?page=urf-add-field-group&edit=' . intval($_POST['group_id']) . '&saved=1')
-                    : admin_url('admin.php?page=urf-field-groups&saved=1');
+                    ? admin_url('admin.php?page=car-add-field-group&edit=' . intval($_POST['group_id']) . '&saved=1')
+                    : admin_url('admin.php?page=car-field-groups&saved=1');
                 
                 echo '<script type="text/javascript">
                     window.location.href = ' . json_encode($redirect_url) . ';
@@ -447,7 +445,7 @@ class Ultimate_Repeater_Field {
     
     ?>
     <div class="wrap">
-        <h1><?php echo $group ? __('Edit Field Group', 'ultimate-repeater-field') : __('Add New Field Group', 'ultimate-repeater-field'); ?></h1>
+        <h1><?php echo $group ? __('Edit Field Group', 'custom-advance-repeater') : __('Add New Field Group', 'custom-advance-repeater'); ?></h1>
         
         <?php 
         echo $error_message;
@@ -455,53 +453,53 @@ class Ultimate_Repeater_Field {
         ?>
         
         <form method="post" action="">
-            <?php wp_nonce_field('urf_save_field_group', 'urf_field_group_nonce'); ?>
+            <?php wp_nonce_field('car_save_field_group', 'car_field_group_nonce'); ?>
             <input type="hidden" name="group_id" value="<?php echo $group_id; ?>">
             
             <table class="form-table">
                 <tr>
-                    <th scope="row"><label for="group_name"><?php _e('Group Name', 'ultimate-repeater-field'); ?> *</label></th>
+                    <th scope="row"><label for="group_name"><?php _e('Group Name', 'custom-advance-repeater'); ?> *</label></th>
                     <td>
                         <input type="text" id="group_name" name="group_name" class="regular-text" 
                                value="<?php echo $group ? esc_attr($group->name) : ''; ?>" required>
-                        <p class="description"><?php _e('Enter a descriptive name for this field group', 'ultimate-repeater-field'); ?></p>
+                        <p class="description"><?php _e('Enter a descriptive name for this field group', 'custom-advance-repeater'); ?></p>
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><label for="group_slug"><?php _e('Group Slug', 'ultimate-repeater-field'); ?> *</label></th>
+                    <th scope="row"><label for="group_slug"><?php _e('Group Slug', 'custom-advance-repeater'); ?> *</label></th>
                     <td>
                         <input type="text" id="group_slug" name="group_slug" class="regular-text" 
                                value="<?php echo $group ? esc_attr($group->slug) : ''; ?>" required>
-                        <p class="description"><?php _e('Unique identifier (lowercase, no spaces)', 'ultimate-repeater-field'); ?></p>
+                        <p class="description"><?php _e('Unique identifier (lowercase, no spaces)', 'custom-advance-repeater'); ?></p>
                     </td>
                 </tr>
                 
                 <tr>
-                    <th scope="row"><label><?php _e('Display Logic', 'ultimate-repeater-field'); ?></label></th>
+                    <th scope="row"><label><?php _e('Display Logic', 'custom-advance-repeater'); ?></label></th>
                     <td>
                         <p>
                             <label>
                                 <input type="radio" name="display_logic" value="all" <?php echo !$group || (empty($selected_types) && empty($group->pages)) || (is_array($selected_types) && in_array('all', $selected_types)) ? 'checked' : ''; ?>>
-                                <?php _e('Show on all posts/pages', 'ultimate-repeater-field'); ?>
+                                <?php _e('Show on all posts/pages', 'custom-advance-repeater'); ?>
                             </label>
                         </p>
                         <p>
                             <label>
                                 <input type="radio" name="display_logic" value="post_types" <?php echo $group && (!empty($selected_types) || !empty($group->pages)) && (!is_array($selected_types) || !in_array('all', $selected_types)) ? 'checked' : ''; ?>>
-                                <?php _e('Show on specific post types or pages', 'ultimate-repeater-field'); ?>
+                                <?php _e('Show on specific post types or pages', 'custom-advance-repeater'); ?>
                             </label>
                         </p>
                     </td>
                 </tr>
                 
                 <tr class="display-options" style="display: none;">
-                    <th scope="row"><label><?php _e('Post Types', 'ultimate-repeater-field'); ?></label></th>
+                    <th scope="row"><label><?php _e('Post Types', 'custom-advance-repeater'); ?></label></th>
                     <td>
                         <div style="margin-bottom: 10px;">
                             <label>
                                 <input type="checkbox" name="all_post_types" value="1" class="all-post-types">
-                                <?php _e('All Post Types', 'ultimate-repeater-field'); ?>
+                                <?php _e('All Post Types', 'custom-advance-repeater'); ?>
                             </label>
                         </div>
                         <div class="post-types-container" style="max-height: 200px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px;">
@@ -519,20 +517,20 @@ class Ultimate_Repeater_Field {
                                 </label>
                             <?php endforeach; ?>
                         </div>
-                        <p class="description"><?php _e('Select which post types this field group should appear on', 'ultimate-repeater-field'); ?></p>
+                        <p class="description"><?php _e('Select which post types this field group should appear on', 'custom-advance-repeater'); ?></p>
                     </td>
                 </tr>
                 
                 <tr class="display-options pages-section" style="display: none;">
-                    <th scope="row"><label><?php _e('Specific Pages', 'ultimate-repeater-field'); ?></label></th>
+                    <th scope="row"><label><?php _e('Specific Pages', 'custom-advance-repeater'); ?></label></th>
                     <td>
                         <div class="specific-pages-container">
                             <div style="margin-bottom: 10px;">
                                 <button type="button" class="button button-small" id="select-pages-btn">
-                                    <?php _e('Select Pages', 'ultimate-repeater-field'); ?>
+                                    <?php _e('Select Pages', 'custom-advance-repeater'); ?>
                                 </button>
                                 <button type="button" class="button button-small" id="clear-pages-btn" style="margin-left: 5px;">
-                                    <?php _e('Clear Selection', 'ultimate-repeater-field'); ?>
+                                    <?php _e('Clear Selection', 'custom-advance-repeater'); ?>
                                 </button>
                             </div>
                             
@@ -558,30 +556,30 @@ class Ultimate_Repeater_Field {
                             <div id="pages-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 9999;">
                                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; width: 80%; max-width: 600px; max-height: 80%; overflow: hidden; display: flex; flex-direction: column;">
                                     <div style="padding: 20px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;">
-                                        <h3 style="margin: 0;"><?php _e('Select Pages', 'ultimate-repeater-field'); ?></h3>
+                                        <h3 style="margin: 0;"><?php _e('Select Pages', 'custom-advance-repeater'); ?></h3>
                                         <button type="button" id="close-modal" style="background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
                                     </div>
                                     <div style="padding: 20px; overflow-y: auto; flex-grow: 1;">
-                                        <input type="text" id="page-search" placeholder="<?php _e('Search pages...', 'ultimate-repeater-field'); ?>" style="width: 100%; padding: 8px; margin-bottom: 10px;">
+                                        <input type="text" id="page-search" placeholder="<?php _e('Search pages...', 'custom-advance-repeater'); ?>" style="width: 100%; padding: 8px; margin-bottom: 10px;">
                                         <div id="pages-list" style="max-height: 300px; overflow-y: auto;">
                                             <!-- Pages will be loaded via AJAX -->
                                         </div>
                                     </div>
                                     <div style="padding: 15px 20px; border-top: 1px solid #ddd; text-align: right;">
-                                        <button type="button" id="add-selected-pages" class="button button-primary"><?php _e('Add Selected Pages', 'ultimate-repeater-field'); ?></button>
+                                        <button type="button" id="add-selected-pages" class="button button-primary"><?php _e('Add Selected Pages', 'custom-advance-repeater'); ?></button>
                                     </div>
                                 </div>
                             </div>
                             
-                            <p class="description"><?php _e('Select specific pages where this field group should appear', 'ultimate-repeater-field'); ?></p>
+                            <p class="description"><?php _e('Select specific pages where this field group should appear', 'custom-advance-repeater'); ?></p>
                         </div>
                     </td>
                 </tr>
             </table>
             
-            <h2><?php _e('Fields', 'ultimate-repeater-field'); ?></h2>
+            <h2><?php _e('Fields', 'custom-advance-repeater'); ?></h2>
             
-            <div id="urf-fields-container">
+            <div id="car-fields-container">
                 <?php
                 $fields_count = 0;
                 if ($group) {
@@ -596,19 +594,19 @@ class Ultimate_Repeater_Field {
                 ?>
             </div>
             
-            <button type="button" id="urf-add-field" class="button button-secondary">
-                <span class="dashicons dashicons-plus"></span> <?php _e('Add Field', 'ultimate-repeater-field'); ?>
+            <button type="button" id="car-add-field" class="button button-secondary">
+                <span class="dashicons dashicons-plus"></span> <?php _e('Add Field', 'custom-advance-repeater'); ?>
             </button>
             
             <hr>
             
             <p class="submit">
                 <button type="submit" name="save_field_group" value="1" class="button button-primary button-large">
-                    <?php _e('Save Field Group', 'ultimate-repeater-field'); ?>
+                    <?php _e('Save Field Group', 'custom-advance-repeater'); ?>
                 </button>
                 <?php if ($group): ?>
-                    <a href="<?php echo admin_url('admin.php?page=urf-field-groups'); ?>" class="button button-secondary" style="margin-left: 10px;">
-                        <?php _e('Cancel', 'ultimate-repeater-field'); ?>
+                    <a href="<?php echo admin_url('admin.php?page=car-field-groups'); ?>" class="button button-secondary" style="margin-left: 10px;">
+                        <?php _e('Cancel', 'custom-advance-repeater'); ?>
                     </a>
                 <?php endif; ?>
             </p>
@@ -709,12 +707,12 @@ class Ultimate_Repeater_Field {
         const selectedPagesContainer = document.getElementById('selected-pages-container');
         
         function loadPages(search = '') {
-            pagesList.innerHTML = '<p><?php _e('Loading pages...', 'ultimate-repeater-field'); ?></p>';
+            pagesList.innerHTML = '<p><?php _e('Loading pages...', 'custom-advance-repeater'); ?></p>';
             
             const data = new FormData();
-            data.append('action', 'urf_get_pages');
+            data.append('action', 'car_get_pages');
             data.append('search', search);
-            data.append('nonce', '<?php echo wp_create_nonce('urf_ajax_nonce'); ?>');
+            data.append('nonce', '<?php echo wp_create_nonce('car_ajax_nonce'); ?>');
             
             fetch(ajaxurl, {
                 method: 'POST',
@@ -755,14 +753,14 @@ class Ultimate_Repeater_Field {
                             pagesList.appendChild(pageDiv);
                         });
                     } else {
-                        pagesList.innerHTML = '<p><?php _e('No pages found.', 'ultimate-repeater-field'); ?></p>';
+                        pagesList.innerHTML = '<p><?php _e('No pages found.', 'custom-advance-repeater'); ?></p>';
                     }
                 } else {
-                    pagesList.innerHTML = '<p><?php _e('Error loading pages.', 'ultimate-repeater-field'); ?></p>';
+                    pagesList.innerHTML = '<p><?php _e('Error loading pages.', 'custom-advance-repeater'); ?></p>';
                 }
             })
             .catch(error => {
-                pagesList.innerHTML = '<p><?php _e('Error loading pages.', 'ultimate-repeater-field'); ?></p>';
+                pagesList.innerHTML = '<p><?php _e('Error loading pages.', 'custom-advance-repeater'); ?></p>';
             });
         }
         
@@ -825,7 +823,7 @@ class Ultimate_Repeater_Field {
         
         if (clearPagesBtn) {
             clearPagesBtn.addEventListener('click', function() {
-                if (confirm('<?php _e('Are you sure you want to clear all selected pages?', 'ultimate-repeater-field'); ?>')) {
+                if (confirm('<?php _e('Are you sure you want to clear all selected pages?', 'custom-advance-repeater'); ?>')) {
                     selectedPagesContainer.innerHTML = '';
                 }
             });
@@ -841,8 +839,8 @@ class Ultimate_Repeater_Field {
         }
         
         // Add field
-        document.getElementById('urf-add-field').addEventListener('click', function() {
-            const container = document.getElementById('urf-fields-container');
+        document.getElementById('car-add-field').addEventListener('click', function() {
+            const container = document.getElementById('car-fields-container');
             const newFieldRow = createFieldRow(fieldIndex);
             container.appendChild(newFieldRow);
             fieldIndex++;
@@ -852,10 +850,10 @@ class Ultimate_Repeater_Field {
         
         // Remove field
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.urf-remove-field')) {
+            if (e.target.closest('.car-remove-field')) {
                 e.preventDefault();
-                if (confirm('<?php _e('Are you sure you want to remove this field?', 'ultimate-repeater-field'); ?>')) {
-                    const row = e.target.closest('.urf-field-row');
+                if (confirm('<?php _e('Are you sure you want to remove this field?', 'custom-advance-repeater'); ?>')) {
+                    const row = e.target.closest('.car-field-row');
                     row.remove();
                     updateFieldIndices();
                 }
@@ -864,10 +862,10 @@ class Ultimate_Repeater_Field {
         
         // Remove subfield
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.urf-remove-subfield')) {
+            if (e.target.closest('.car-remove-subfield')) {
                 e.preventDefault();
-                if (confirm('<?php _e('Are you sure you want to remove this subfield?', 'ultimate-repeater-field'); ?>')) {
-                    const row = e.target.closest('.urf-subfield-row');
+                if (confirm('<?php _e('Are you sure you want to remove this subfield?', 'custom-advance-repeater'); ?>')) {
+                    const row = e.target.closest('.car-subfield-row');
                     row.remove();
                 }
             }
@@ -875,10 +873,10 @@ class Ultimate_Repeater_Field {
         
         // Remove nested subfield
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.urf-remove-nested-subfield')) {
+            if (e.target.closest('.car-remove-nested-subfield')) {
                 e.preventDefault();
-                if (confirm('<?php _e('Are you sure you want to remove this nested subfield?', 'ultimate-repeater-field'); ?>')) {
-                    const row = e.target.closest('.urf-nested-subfield-row');
+                if (confirm('<?php _e('Are you sure you want to remove this nested subfield?', 'custom-advance-repeater'); ?>')) {
+                    const row = e.target.closest('.car-nested-subfield-row');
                     row.remove();
                 }
             }
@@ -894,7 +892,7 @@ class Ultimate_Repeater_Field {
             let isLabelField = false;
             let fieldLevel = null;
             
-            if (target.classList.contains('urf-field-label')) {
+            if (target.classList.contains('car-field-label')) {
                 isLabelField = true;
                 fieldLevel = 0;
             } 
@@ -959,17 +957,17 @@ class Ultimate_Repeater_Field {
             
             switch (fieldLevel) {
                 case 0: // Main fields
-                    const row = target.closest('.urf-field-row');
-                    nameField = row?.querySelector('.urf-field-name');
+                    const row = target.closest('.car-field-row');
+                    nameField = row?.querySelector('.car-field-name');
                     break;
                     
                 case 1: // Subfields
-                    const subRow = target.closest('.urf-subfield-row');
+                    const subRow = target.closest('.car-subfield-row');
                     nameField = subRow?.querySelector('input[name*="[name]"]');
                     break;
                     
                 case 2: // Nested2 subfields
-                    const nestedRow = target.closest('.urf-nested-subfield-row');
+                    const nestedRow = target.closest('.car-nested-subfield-row');
                     nameField = nestedRow?.querySelector('input[name*="[name]"]');
                     break;
             }
@@ -988,8 +986,8 @@ class Ultimate_Repeater_Field {
         // Event listeners for all field levels
         document.addEventListener('input', function(e) {
             // Debounce the function to avoid excessive calls
-            clearTimeout(window.urfDebounceTimer);
-            window.urfDebounceTimer = setTimeout(() => {
+            clearTimeout(window.carDebounceTimer);
+            window.carDebounceTimer = setTimeout(() => {
                 handleLabelToNameConversion(e.target);
             }, 100);
         });
@@ -997,8 +995,8 @@ class Ultimate_Repeater_Field {
         document.addEventListener('keyup', function(e) {
             // Handle on keyup for better responsiveness
             if (e.key.length === 1 || e.key === 'Backspace' || e.key === 'Delete' || e.key === ' ') {
-                clearTimeout(window.urfDebounceTimer);
-                window.urfDebounceTimer = setTimeout(() => {
+                clearTimeout(window.carDebounceTimer);
+                window.carDebounceTimer = setTimeout(() => {
                     handleLabelToNameConversion(e.target);
                 }, 50);
             }
@@ -1016,21 +1014,21 @@ class Ultimate_Repeater_Field {
             console.log('Initializing existing fields...');
             
             // Process existing main fields
-            document.querySelectorAll('.urf-field-label').forEach(function(input) {
+            document.querySelectorAll('.car-field-label').forEach(function(input) {
                 setTimeout(() => {
                     handleLabelToNameConversion(input);
                 }, 50);
             });
             
             // Process existing subfields
-            document.querySelectorAll('.urf-subfield-row input[name*="[label]"]').forEach(function(input) {
+            document.querySelectorAll('.car-subfield-row input[name*="[label]"]').forEach(function(input) {
                 setTimeout(() => {
                     handleLabelToNameConversion(input);
                 }, 50);
             });
             
             // Process existing nested2 subfields
-            document.querySelectorAll('.urf-nested-subfield-row input[name*="[label]"]').forEach(function(input) {
+            document.querySelectorAll('.car-nested-subfield-row input[name*="[label]"]').forEach(function(input) {
                 setTimeout(() => {
                     handleLabelToNameConversion(input);
                 }, 50);
@@ -1042,31 +1040,31 @@ class Ultimate_Repeater_Field {
         
         // Show/hide options based on field type
         document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('urf-field-type')) {
-                const row = e.target.closest('.urf-field-row');
+            if (e.target.classList.contains('car-field-type')) {
+                const row = e.target.closest('.car-field-row');
                 const type = e.target.value;
-                const optionsDiv = row.querySelector('.urf-field-options');
+                const optionsDiv = row.querySelector('.car-field-options');
                 
                 if (['select', 'checkbox', 'radio'].includes(type)) {
                     optionsDiv.style.display = 'block';
-                    const currentIndex = Array.from(document.querySelectorAll('.urf-field-row')).indexOf(row);
+                    const currentIndex = Array.from(document.querySelectorAll('.car-field-row')).indexOf(row);
                     optionsDiv.innerHTML = `
-                        <label><?php _e('Options (one per line)', 'ultimate-repeater-field'); ?></label>
+                        <label><?php _e('Options (one per line)', 'custom-advance-repeater'); ?></label>
                         <textarea name="fields[${currentIndex}][options]" class="widefat" rows="3" placeholder="My Option 1"></textarea>
-                        <p class="description"><?php _e('Enter options one per line. Values will be auto-generated from labels.', 'ultimate-repeater-field'); ?></p>
+                        <p class="description"><?php _e('Enter options one per line. Values will be auto-generated from labels.', 'custom-advance-repeater'); ?></p>
                     `;
                 } else if (type === 'repeater') {
                     optionsDiv.style.display = 'block';
-                    const currentIndex = Array.from(document.querySelectorAll('.urf-field-row')).indexOf(row);
+                    const currentIndex = Array.from(document.querySelectorAll('.car-field-row')).indexOf(row);
                     optionsDiv.innerHTML = `
-                        <label><?php _e('Sub Fields', 'ultimate-repeater-field'); ?></label>
-                        <div class="urf-subfields-container" data-parent-index="${currentIndex}">
+                        <label><?php _e('Sub Fields', 'custom-advance-repeater'); ?></label>
+                        <div class="car-subfields-container" data-parent-index="${currentIndex}">
                             <!-- Subfields will be added here -->
                         </div>
-                        <button type="button" class="button button-small urf-add-subfield" data-parent-index="${currentIndex}">
-                            <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'ultimate-repeater-field'); ?>
+                        <button type="button" class="button button-small car-add-subfield" data-parent-index="${currentIndex}">
+                            <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'custom-advance-repeater'); ?>
                         </button>
-                        <p class="description"><?php _e('Add fields that will appear inside this repeater', 'ultimate-repeater-field'); ?></p>
+                        <p class="description"><?php _e('Add fields that will appear inside this repeater', 'custom-advance-repeater'); ?></p>
                     `;
                 } else {
                     optionsDiv.style.display = 'none';
@@ -1076,28 +1074,28 @@ class Ultimate_Repeater_Field {
         
         // Handle subfield type change
         document.addEventListener('change', function(e) {
-            if (e.target.classList.contains('urf-subfield-type')) {
-                const row = e.target.closest('.urf-subfield-row');
+            if (e.target.classList.contains('car-subfield-type')) {
+                const row = e.target.closest('.car-subfield-row');
                 const type = e.target.value;
-                const optionsDiv = row.querySelector('.urf-subfield-options');
+                const optionsDiv = row.querySelector('.car-subfield-options');
                 
                 if (['select', 'checkbox', 'radio', 'repeater'].includes(type)) {
                     optionsDiv.style.display = 'block';
                     
                     if (type === 'repeater') {
-                        const fieldRow = row.closest('.urf-field-row');
-                        const parentIndex = Array.from(document.querySelectorAll('.urf-field-row')).indexOf(fieldRow);
-                        const subIndex = Array.from(fieldRow.querySelectorAll('.urf-subfield-row')).indexOf(row);
+                        const fieldRow = row.closest('.car-field-row');
+                        const parentIndex = Array.from(document.querySelectorAll('.car-field-row')).indexOf(fieldRow);
+                        const subIndex = Array.from(fieldRow.querySelectorAll('.car-subfield-row')).indexOf(row);
                         
                         optionsDiv.innerHTML = `
-                            <label><?php _e('Sub Fields', 'ultimate-repeater-field'); ?></label>
-                            <div class="urf-subfields-container" data-parent-index="${parentIndex}" data-sub-index="${subIndex}">
+                            <label><?php _e('Sub Fields', 'custom-advance-repeater'); ?></label>
+                            <div class="car-subfields-container" data-parent-index="${parentIndex}" data-sub-index="${subIndex}">
                                 <!-- Nested subfields will be added here -->
                             </div>
-                            <button type="button" class="button button-small urf-add-nested-subfield" data-parent-index="${parentIndex}" data-sub-index="${subIndex}">
-                                <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'ultimate-repeater-field'); ?>
+                            <button type="button" class="button button-small car-add-nested-subfield" data-parent-index="${parentIndex}" data-sub-index="${subIndex}">
+                                <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'custom-advance-repeater'); ?>
                             </button>
-                            <p class="description"><?php _e('Add fields that will appear inside this repeater', 'ultimate-repeater-field'); ?></p>
+                            <p class="description"><?php _e('Add fields that will appear inside this repeater', 'custom-advance-repeater'); ?></p>
                         `;
                     }
                 } else {
@@ -1108,13 +1106,13 @@ class Ultimate_Repeater_Field {
         
         // Add subfield
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.urf-add-subfield')) {
+            if (e.target.closest('.car-add-subfield')) {
                 e.preventDefault();
-                const button = e.target.closest('.urf-add-subfield');
+                const button = e.target.closest('.car-add-subfield');
                 const parentIndex = button.dataset.parentIndex;
-                const container = button.parentElement.querySelector('.urf-subfields-container');
+                const container = button.parentElement.querySelector('.car-subfields-container');
                 
-                const subfieldsCount = container.querySelectorAll('.urf-subfield-row').length;
+                const subfieldsCount = container.querySelectorAll('.car-subfield-row').length;
                 
                 const newSubfield = createSubfieldRow(parentIndex, subfieldsCount);
                 container.appendChild(newSubfield);
@@ -1134,14 +1132,14 @@ class Ultimate_Repeater_Field {
         
         // Add nested subfield
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.urf-add-nested-subfield')) {
+            if (e.target.closest('.car-add-nested-subfield')) {
                 e.preventDefault();
-                const button = e.target.closest('.urf-add-nested-subfield');
+                const button = e.target.closest('.car-add-nested-subfield');
                 const parentIndex = button.dataset.parentIndex;
                 const subIndex = button.dataset.subIndex;
-                const container = button.parentElement.querySelector('.urf-subfields-container');
+                const container = button.parentElement.querySelector('.car-subfields-container');
                 
-                const nestedSubfieldsCount = container.querySelectorAll('.urf-nested-subfield-row').length;
+                const nestedSubfieldsCount = container.querySelectorAll('.car-nested-subfield-row').length;
                 const newNestedSubfield = createNestedSubfieldRow(parentIndex, subIndex, nestedSubfieldsCount);
                 container.appendChild(newNestedSubfield);
                 
@@ -1159,69 +1157,69 @@ class Ultimate_Repeater_Field {
         });
         
         // Initialize field type changes
-        document.querySelectorAll('.urf-field-type').forEach(function(select) {
+        document.querySelectorAll('.car-field-type').forEach(function(select) {
             select.dispatchEvent(new Event('change'));
         });
         
         // Initialize subfield type changes
-        document.querySelectorAll('.urf-subfield-type').forEach(function(select) {
+        document.querySelectorAll('.car-subfield-type').forEach(function(select) {
             select.dispatchEvent(new Event('change'));
         });
         
         function createFieldRow(index) {
             const div = document.createElement('div');
-            div.className = 'urf-field-row';
+            div.className = 'car-field-row';
             div.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                    <h3 style="margin: 0;"><?php _e('Field', 'ultimate-repeater-field'); ?> #<span class="field-index">${index + 1}</span></h3>
-                    <a href="#" class="urf-remove-field" style="color: #dc3232; text-decoration: none;">
-                        <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'ultimate-repeater-field'); ?>
+                    <h3 style="margin: 0;"><?php _e('Field', 'custom-advance-repeater'); ?> #<span class="field-index">${index + 1}</span></h3>
+                    <a href="#" class="car-remove-field" style="color: #dc3232; text-decoration: none;">
+                        <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                     </a>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
                     <div>
-                        <label><?php _e('Field Type', 'ultimate-repeater-field'); ?> *</label>
-                        <select name="fields[${index}][type]" class="urf-field-type widefat" required>
-                            <option value="text"><?php _e('Text', 'ultimate-repeater-field'); ?></option>
-                            <option value="textarea"><?php _e('Textarea', 'ultimate-repeater-field'); ?></option>
-                            <option value="image"><?php _e('Image Upload', 'ultimate-repeater-field'); ?></option>
-                            <option value="select"><?php _e('Select Dropdown', 'ultimate-repeater-field'); ?></option>
-                            <option value="checkbox"><?php _e('Checkbox', 'ultimate-repeater-field'); ?></option>
-                            <option value="radio"><?php _e('Radio Buttons', 'ultimate-repeater-field'); ?></option>
-                            <option value="color"><?php _e('Color Picker', 'ultimate-repeater-field'); ?></option>
-                            <option value="date"><?php _e('Date Picker', 'ultimate-repeater-field'); ?></option>
-                            <option value="repeater"><?php _e('Repeater Field', 'ultimate-repeater-field'); ?></option>
+                        <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
+                        <select name="fields[${index}][type]" class="car-field-type widefat" required>
+                            <option value="text"><?php _e('Text', 'custom-advance-repeater'); ?></option>
+                            <option value="textarea"><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
+                            <option value="image"><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
+                            <option value="select"><?php _e('Select Dropdown', 'custom-advance-repeater'); ?></option>
+                            <option value="checkbox"><?php _e('Checkbox', 'custom-advance-repeater'); ?></option>
+                            <option value="radio"><?php _e('Radio Buttons', 'custom-advance-repeater'); ?></option>
+                            <option value="color"><?php _e('Color Picker', 'custom-advance-repeater'); ?></option>
+                            <option value="date"><?php _e('Date Picker', 'custom-advance-repeater'); ?></option>
+                            <option value="repeater"><?php _e('Repeater Field', 'custom-advance-repeater'); ?></option>
                         </select>
                     </div>
                     
                     <div>
-                        <label><?php _e('Field Label', 'ultimate-repeater-field'); ?> *</label>
-                        <input type="text" name="fields[${index}][label]" class="urf-field-label widefat" required placeholder="<?php _e('My Field Label', 'ultimate-repeater-field'); ?>">
+                        <label><?php _e('Field Label', 'custom-advance-repeater'); ?> *</label>
+                        <input type="text" name="fields[${index}][label]" class="car-field-label widefat" required placeholder="<?php _e('My Field Label', 'custom-advance-repeater'); ?>">
                     </div>
                     
                     <div>
-                        <label><?php _e('Field Name', 'ultimate-repeater-field'); ?> *</label>
-                        <input type="text" name="fields[${index}][name]" class="urf-field-name widefat" required placeholder="<?php _e('my_field_name', 'ultimate-repeater-field'); ?>">
-                        <p class="description"><?php _e('Lowercase, underscores, no spaces', 'ultimate-repeater-field'); ?></p>
+                        <label><?php _e('Field Name', 'custom-advance-repeater'); ?> *</label>
+                        <input type="text" name="fields[${index}][name]" class="car-field-name widefat" required placeholder="<?php _e('my_field_name', 'custom-advance-repeater'); ?>">
+                        <p class="description"><?php _e('Lowercase, underscores, no spaces', 'custom-advance-repeater'); ?></p>
                     </div>
                 </div>
                 
-                <div class="urf-field-options" style="display: none; margin-bottom: 15px;">
+                <div class="car-field-options" style="display: none; margin-bottom: 15px;">
                     <!-- Options or subfields will be added here based on field type -->
                 </div>
                 
                 <div>
                     <label>
                         <input type="checkbox" name="fields[${index}][required]" value="1">
-                        <?php _e('Required Field', 'ultimate-repeater-field'); ?>
+                        <?php _e('Required Field', 'custom-advance-repeater'); ?>
                     </label>
                 </div>
             `;
             
             // Add event listener for the new field
-            const labelInput = div.querySelector('.urf-field-label');
-            const nameInput = div.querySelector('.urf-field-name');
+            const labelInput = div.querySelector('.car-field-label');
+            const nameInput = div.querySelector('.car-field-name');
             
             if (labelInput && nameInput) {
                 labelInput.addEventListener('input', function() {
@@ -1234,50 +1232,50 @@ class Ultimate_Repeater_Field {
         
         function createSubfieldRow(parentIndex, subIndex) {
             const div = document.createElement('div');
-            div.className = 'urf-subfield-row';
+            div.className = 'car-subfield-row';
             div.style.cssText = 'border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f9f9f9;';
             div.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                    <strong><?php _e('Sub Field', 'ultimate-repeater-field'); ?></strong>
-                    <a href="#" class="urf-remove-subfield" style="color: #dc3232; text-decoration: none;">
-                        <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'ultimate-repeater-field'); ?>
+                    <strong><?php _e('Sub Field', 'custom-advance-repeater'); ?></strong>
+                    <a href="#" class="car-remove-subfield" style="color: #dc3232; text-decoration: none;">
+                        <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                     </a>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;">
                     <div>
-                        <label><?php _e('Field Type', 'ultimate-repeater-field'); ?> *</label>
-                        <select name="fields[${parentIndex}][subfields][${subIndex}][type]" class="widefat urf-subfield-type" required>
-                            <option value="text"><?php _e('Text', 'ultimate-repeater-field'); ?></option>
-                            <option value="textarea"><?php _e('Textarea', 'ultimate-repeater-field'); ?></option>
-                            <option value="image"><?php _e('Image Upload', 'ultimate-repeater-field'); ?></option>
-                            <option value="select"><?php _e('Select Dropdown', 'ultimate-repeater-field'); ?></option>
-                            <option value="checkbox"><?php _e('Checkbox', 'ultimate-repeater-field'); ?></option>
-                            <option value="radio"><?php _e('Radio Buttons', 'ultimate-repeater-field'); ?></option>
-                            <option value="repeater"><?php _e('Repeater Field', 'ultimate-repeater-field'); ?></option>
+                        <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
+                        <select name="fields[${parentIndex}][subfields][${subIndex}][type]" class="widefat car-subfield-type" required>
+                            <option value="text"><?php _e('Text', 'custom-advance-repeater'); ?></option>
+                            <option value="textarea"><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
+                            <option value="image"><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
+                            <option value="select"><?php _e('Select Dropdown', 'custom-advance-repeater'); ?></option>
+                            <option value="checkbox"><?php _e('Checkbox', 'custom-advance-repeater'); ?></option>
+                            <option value="radio"><?php _e('Radio Buttons', 'custom-advance-repeater'); ?></option>
+                            <option value="repeater"><?php _e('Repeater Field', 'custom-advance-repeater'); ?></option>
                         </select>
                     </div>
                     
                     <div>
-                        <label><?php _e('Field Label', 'ultimate-repeater-field'); ?> *</label>
-                        <input type="text" name="fields[${parentIndex}][subfields][${subIndex}][label]" class="widefat" required placeholder="<?php _e('My Sub Field Label', 'ultimate-repeater-field'); ?>">
+                        <label><?php _e('Field Label', 'custom-advance-repeater'); ?> *</label>
+                        <input type="text" name="fields[${parentIndex}][subfields][${subIndex}][label]" class="widefat" required placeholder="<?php _e('My Sub Field Label', 'custom-advance-repeater'); ?>">
                     </div>
                     
                     <div>
-                        <label><?php _e('Field Name', 'ultimate-repeater-field'); ?> *</label>
-                        <input type="text" name="fields[${parentIndex}][subfields][${subIndex}][name]" class="widefat" required placeholder="<?php _e('my_sub_field_name', 'ultimate-repeater-field'); ?>">
-                        <p class="description"><?php _e('Lowercase, underscores, no spaces', 'ultimate-repeater-field'); ?></p>
+                        <label><?php _e('Field Name', 'custom-advance-repeater'); ?> *</label>
+                        <input type="text" name="fields[${parentIndex}][subfields][${subIndex}][name]" class="widefat" required placeholder="<?php _e('my_sub_field_name', 'custom-advance-repeater'); ?>">
+                        <p class="description"><?php _e('Lowercase, underscores, no spaces', 'custom-advance-repeater'); ?></p>
                     </div>
                 </div>
                 
-                <div class="urf-subfield-options" style="display: none; margin-bottom: 10px;">
+                <div class="car-subfield-options" style="display: none; margin-bottom: 10px;">
                     <!-- Options will be added based on field type -->
                 </div>
                 
                 <div>
                     <label>
                         <input type="checkbox" name="fields[${parentIndex}][subfields][${subIndex}][required]" value="1">
-                        <?php _e('Required Field', 'ultimate-repeater-field'); ?>
+                        <?php _e('Required Field', 'custom-advance-repeater'); ?>
                     </label>
                 </div>
             `;
@@ -1297,45 +1295,45 @@ class Ultimate_Repeater_Field {
         
         function createNestedSubfieldRow(parentIndex, subIndex, nestedIndex) {
             const div = document.createElement('div');
-            div.className = 'urf-nested-subfield-row';
+            div.className = 'car-nested-subfield-row';
             div.style.cssText = 'border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: #f0f0f0;';
             div.innerHTML = `
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                    <strong><?php _e('Nested Sub Field', 'ultimate-repeater-field'); ?></strong>
-                    <a href="#" class="urf-remove-nested-subfield" style="color: #dc3232; text-decoration: none;">
-                        <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'ultimate-repeater-field'); ?>
+                    <strong><?php _e('Nested Sub Field', 'custom-advance-repeater'); ?></strong>
+                    <a href="#" class="car-remove-nested-subfield" style="color: #dc3232; text-decoration: none;">
+                        <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                     </a>
                 </div>
                 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;">
                     <div>
-                        <label><?php _e('Field Type', 'ultimate-repeater-field'); ?> *</label>
+                        <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
                         <select name="fields[${parentIndex}][subfields][${subIndex}][subfields][${nestedIndex}][type]" class="widefat" required>
-                            <option value="text"><?php _e('Text', 'ultimate-repeater-field'); ?></option>
-                            <option value="textarea"><?php _e('Textarea', 'ultimate-repeater-field'); ?></option>
-                            <option value="image"><?php _e('Image Upload', 'ultimate-repeater-field'); ?></option>
-                            <option value="select"><?php _e('Select Dropdown', 'ultimate-repeater-field'); ?></option>
-                            <option value="checkbox"><?php _e('Checkbox', 'ultimate-repeater-field'); ?></option>
-                            <option value="radio"><?php _e('Radio Buttons', 'ultimate-repeater-field'); ?></option>
+                            <option value="text"><?php _e('Text', 'custom-advance-repeater'); ?></option>
+                            <option value="textarea"><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
+                            <option value="image"><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
+                            <option value="select"><?php _e('Select Dropdown', 'custom-advance-repeater'); ?></option>
+                            <option value="checkbox"><?php _e('Checkbox', 'custom-advance-repeater'); ?></option>
+                            <option value="radio"><?php _e('Radio Buttons', 'custom-advance-repeater'); ?></option>
                         </select>
                     </div>
                     
                     <div>
-                        <label><?php _e('Field Label', 'ultimate-repeater-field'); ?> *</label>
-                        <input type="text" name="fields[${parentIndex}][subfields][${subIndex}][subfields][${nestedIndex}][label]" class="widefat" required placeholder="<?php _e('My Nested Field Label', 'ultimate-repeater-field'); ?>">
+                        <label><?php _e('Field Label', 'custom-advance-repeater'); ?> *</label>
+                        <input type="text" name="fields[${parentIndex}][subfields][${subIndex}][subfields][${nestedIndex}][label]" class="widefat" required placeholder="<?php _e('My Nested Field Label', 'custom-advance-repeater'); ?>">
                     </div>
                     
                     <div>
-                        <label><?php _e('Field Name', 'ultimate-repeater-field'); ?> *</label>
-                        <input type="text" name="fields[${parentIndex}][subfields][${subIndex}][subfields][${nestedIndex}][name]" class="widefat" required placeholder="<?php _e('my_nested_field_name', 'ultimate-repeater-field'); ?>">
-                        <p class="description"><?php _e('Lowercase, underscores, no spaces', 'ultimate-repeater-field'); ?></p>
+                        <label><?php _e('Field Name', 'custom-advance-repeater'); ?> *</label>
+                        <input type="text" name="fields[${parentIndex}][subfields][${subIndex}][subfields][${nestedIndex}][name]" class="widefat" required placeholder="<?php _e('my_nested_field_name', 'custom-advance-repeater'); ?>">
+                        <p class="description"><?php _e('Lowercase, underscores, no spaces', 'custom-advance-repeater'); ?></p>
                     </div>
                 </div>
                 
                 <div>
                     <label>
                         <input type="checkbox" name="fields[${parentIndex}][subfields][${subIndex}][subfields][${nestedIndex}][required]" value="1">
-                        <?php _e('Required Field', 'ultimate-repeater-field'); ?>
+                        <?php _e('Required Field', 'custom-advance-repeater'); ?>
                     </label>
                 </div>
             `;
@@ -1354,7 +1352,7 @@ class Ultimate_Repeater_Field {
         }
         
         function updateFieldIndices() {
-            const rows = document.querySelectorAll('.urf-field-row');
+            const rows = document.querySelectorAll('.car-field-row');
             rows.forEach(function(row, index) {
                 row.querySelector('.field-index').textContent = index + 1;
                 
@@ -1368,12 +1366,12 @@ class Ultimate_Repeater_Field {
                     }
                 });
                 
-                const subfieldsContainer = row.querySelector('.urf-subfields-container');
+                const subfieldsContainer = row.querySelector('.car-subfields-container');
                 if (subfieldsContainer) {
                     subfieldsContainer.dataset.parentIndex = index;
                 }
                 
-                const addSubfieldBtn = row.querySelector('.urf-add-subfield');
+                const addSubfieldBtn = row.querySelector('.car-add-subfield');
                 if (addSubfieldBtn) {
                     addSubfieldBtn.dataset.parentIndex = index;
                 }
@@ -1387,49 +1385,49 @@ class Ultimate_Repeater_Field {
     
     public function render_field_row($index, $field) {
         ?>
-        <div class="urf-field-row" style="margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #ccd0d4; border-radius: 4px;">
+        <div class="car-field-row" style="margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #ccd0d4; border-radius: 4px;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
-                <h3 style="margin: 0;"><?php _e('Field', 'ultimate-repeater-field'); ?> #<span class="field-index"><?php echo $index + 1; ?></span></h3>
-                <a href="#" class="urf-remove-field" style="color: #dc3232; text-decoration: none;">
-                    <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'ultimate-repeater-field'); ?>
+                <h3 style="margin: 0;"><?php _e('Field', 'custom-advance-repeater'); ?> #<span class="field-index"><?php echo $index + 1; ?></span></h3>
+                <a href="#" class="car-remove-field" style="color: #dc3232; text-decoration: none;">
+                    <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                 </a>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px;">
                 <div>
-                    <label><?php _e('Field Type', 'ultimate-repeater-field'); ?> *</label>
-                    <select name="fields[<?php echo $index; ?>][type]" class="urf-field-type widefat" required>
-                        <option value="text" <?php selected($field['type'] ?? '', 'text'); ?>><?php _e('Text', 'ultimate-repeater-field'); ?></option>
-                        <option value="textarea" <?php selected($field['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'ultimate-repeater-field'); ?></option>
-                        <option value="image" <?php selected($field['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'ultimate-repeater-field'); ?></option>
-                        <option value="select" <?php selected($field['type'] ?? '', 'select'); ?>><?php _e('Select Dropdown', 'ultimate-repeater-field'); ?></option>
-                        <option value="checkbox" <?php selected($field['type'] ?? '', 'checkbox'); ?>><?php _e('Checkbox', 'ultimate-repeater-field'); ?></option>
-                        <option value="radio" <?php selected($field['type'] ?? '', 'radio'); ?>><?php _e('Radio Buttons', 'ultimate-repeater-field'); ?></option>
-                        <option value="color" <?php selected($field['type'] ?? '', 'color'); ?>><?php _e('Color Picker', 'ultimate-repeater-field'); ?></option>
-                        <option value="date" <?php selected($field['type'] ?? '', 'date'); ?>><?php _e('Date Picker', 'ultimate-repeater-field'); ?></option>
-                        <option value="repeater" <?php selected($field['type'] ?? '', 'repeater'); ?>><?php _e('Repeater Field', 'ultimate-repeater-field'); ?></option>
+                    <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
+                    <select name="fields[<?php echo $index; ?>][type]" class="car-field-type widefat" required>
+                        <option value="text" <?php selected($field['type'] ?? '', 'text'); ?>><?php _e('Text', 'custom-advance-repeater'); ?></option>
+                        <option value="textarea" <?php selected($field['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
+                        <option value="image" <?php selected($field['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
+                        <option value="select" <?php selected($field['type'] ?? '', 'select'); ?>><?php _e('Select Dropdown', 'custom-advance-repeater'); ?></option>
+                        <option value="checkbox" <?php selected($field['type'] ?? '', 'checkbox'); ?>><?php _e('Checkbox', 'custom-advance-repeater'); ?></option>
+                        <option value="radio" <?php selected($field['type'] ?? '', 'radio'); ?>><?php _e('Radio Buttons', 'custom-advance-repeater'); ?></option>
+                        <option value="color" <?php selected($field['type'] ?? '', 'color'); ?>><?php _e('Color Picker', 'custom-advance-repeater'); ?></option>
+                        <option value="date" <?php selected($field['type'] ?? '', 'date'); ?>><?php _e('Date Picker', 'custom-advance-repeater'); ?></option>
+                        <option value="repeater" <?php selected($field['type'] ?? '', 'repeater'); ?>><?php _e('Repeater Field', 'custom-advance-repeater'); ?></option>
                     </select>
                 </div>
                 
                 <div>
-                    <label><?php _e('Field Label', 'ultimate-repeater-field'); ?> *</label>
+                    <label><?php _e('Field Label', 'custom-advance-repeater'); ?> *</label>
                     <input type="text" name="fields[<?php echo $index; ?>][label]" 
                            value="<?php echo esc_attr($field['label'] ?? ''); ?>" 
-                           class="urf-field-label widefat" required>
+                           class="car-field-label widefat" required>
                 </div>
                 
                 <div>
-                    <label><?php _e('Field Name', 'ultimate-repeater-field'); ?> *</label>
+                    <label><?php _e('Field Name', 'custom-advance-repeater'); ?> *</label>
                     <input type="text" name="fields[<?php echo $index; ?>][name]" 
                            value="<?php echo esc_attr($field['name'] ?? ''); ?>" 
-                           class="urf-field-name widefat" required>
-                    <p class="description"><?php _e('Lowercase, underscores, no spaces', 'ultimate-repeater-field'); ?></p>
+                           class="car-field-name widefat" required>
+                    <p class="description"><?php _e('Lowercase, underscores, no spaces', 'custom-advance-repeater'); ?></p>
                 </div>
             </div>
             
-            <div class="urf-field-options" style="display: <?php echo in_array($field['type'] ?? '', ['select', 'checkbox', 'radio', 'repeater']) ? 'block' : 'none'; ?>; margin-bottom: 15px;">
+            <div class="car-field-options" style="display: <?php echo in_array($field['type'] ?? '', ['select', 'checkbox', 'radio', 'repeater']) ? 'block' : 'none'; ?>; margin-bottom: 15px;">
                 <?php if (in_array($field['type'] ?? '', ['select', 'checkbox', 'radio'])): ?>
-					<label><?php _e('Options (one per line)', 'ultimate-repeater-field'); ?></label>
+					<label><?php _e('Options (one per line)', 'custom-advance-repeater'); ?></label>
 					<?php
 					$options_text = '';
 					if (!empty($field['options'])) {
@@ -1450,11 +1448,11 @@ class Ultimate_Repeater_Field {
 					}
 					?>
 					<textarea name="fields[<?php echo $index; ?>][options]" class="widefat" rows="3" placeholder="My Option 1"><?php echo esc_textarea($options_text); ?></textarea>
-					<p class="description"><?php _e('Enter options one per line.', 'ultimate-repeater-field'); ?></p>
+					<p class="description"><?php _e('Enter options one per line.', 'custom-advance-repeater'); ?></p>
 
                 <?php elseif (($field['type'] ?? '') === 'repeater'): ?>
-                    <label><?php _e('Sub Fields', 'ultimate-repeater-field'); ?></label>
-                    <div class="urf-subfields-container" data-parent-index="<?php echo $index; ?>">
+                    <label><?php _e('Sub Fields', 'custom-advance-repeater'); ?></label>
+                    <div class="car-subfields-container" data-parent-index="<?php echo $index; ?>">
                         <?php
                         if (isset($field['subfields']) && is_array($field['subfields'])) {
                             foreach ($field['subfields'] as $sub_index => $subfield) {
@@ -1463,17 +1461,17 @@ class Ultimate_Repeater_Field {
                         }
                         ?>
                     </div>
-                    <button type="button" class="button button-small urf-add-subfield" data-parent-index="<?php echo $index; ?>">
-                        <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'ultimate-repeater-field'); ?>
+                    <button type="button" class="button button-small car-add-subfield" data-parent-index="<?php echo $index; ?>">
+                        <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'custom-advance-repeater'); ?>
                     </button>
-                    <p class="description"><?php _e('Add fields that will appear inside this repeater', 'ultimate-repeater-field'); ?></p>
+                    <p class="description"><?php _e('Add fields that will appear inside this repeater', 'custom-advance-repeater'); ?></p>
                 <?php endif; ?>
             </div>
             
             <div>
                 <label>
                     <input type="checkbox" name="fields[<?php echo $index; ?>][required]" value="1" <?php checked($field['required'] ?? false, true); ?>>
-                    <?php _e('Required Field', 'ultimate-repeater-field'); ?>
+                    <?php _e('Required Field', 'custom-advance-repeater'); ?>
                 </label>
             </div>
         </div>
@@ -1482,50 +1480,50 @@ class Ultimate_Repeater_Field {
     
     public function render_subfield_row($parent_index, $sub_index, $subfield = array()) {
         ?>
-        <div class="urf-subfield-row" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f9f9f9;">
+        <div class="car-subfield-row" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; background: #f9f9f9;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <strong><?php _e('Sub Field', 'ultimate-repeater-field'); ?></strong>
-                <a href="#" class="urf-remove-subfield" style="color: #dc3232; text-decoration: none;">
-                    <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'ultimate-repeater-field'); ?>
+                <strong><?php _e('Sub Field', 'custom-advance-repeater'); ?></strong>
+                <a href="#" class="car-remove-subfield" style="color: #dc3232; text-decoration: none;">
+                    <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                 </a>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div>
-                    <label><?php _e('Field Type', 'ultimate-repeater-field'); ?> *</label>
-                    <select name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][type]" class="widefat urf-subfield-type" required>
-                        <option value="text" <?php selected($subfield['type'] ?? '', 'text'); ?>><?php _e('Text', 'ultimate-repeater-field'); ?></option>
-                        <option value="textarea" <?php selected($subfield['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'ultimate-repeater-field'); ?></option>
-                        <option value="image" <?php selected($subfield['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'ultimate-repeater-field'); ?></option>
-                        <option value="select" <?php selected($subfield['type'] ?? '', 'select'); ?>><?php _e('Select Dropdown', 'ultimate-repeater-field'); ?></option>
-                        <option value="checkbox" <?php selected($subfield['type'] ?? '', 'checkbox'); ?>><?php _e('Checkbox', 'ultimate-repeater-field'); ?></option>
-                        <option value="radio" <?php selected($subfield['type'] ?? '', 'radio'); ?>><?php _e('Radio Buttons', 'ultimate-repeater-field'); ?></option>
-                        <option value="color" <?php selected($subfield['type'] ?? '', 'color'); ?>><?php _e('Color Picker', 'ultimate-repeater-field'); ?></option>
-                        <option value="date" <?php selected($subfield['type'] ?? '', 'date'); ?>><?php _e('Date Picker', 'ultimate-repeater-field'); ?></option>
+                    <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
+                    <select name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][type]" class="widefat car-subfield-type" required>
+                        <option value="text" <?php selected($subfield['type'] ?? '', 'text'); ?>><?php _e('Text', 'custom-advance-repeater'); ?></option>
+                        <option value="textarea" <?php selected($subfield['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
+                        <option value="image" <?php selected($subfield['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
+                        <option value="select" <?php selected($subfield['type'] ?? '', 'select'); ?>><?php _e('Select Dropdown', 'custom-advance-repeater'); ?></option>
+                        <option value="checkbox" <?php selected($subfield['type'] ?? '', 'checkbox'); ?>><?php _e('Checkbox', 'custom-advance-repeater'); ?></option>
+                        <option value="radio" <?php selected($subfield['type'] ?? '', 'radio'); ?>><?php _e('Radio Buttons', 'custom-advance-repeater'); ?></option>
+                        <option value="color" <?php selected($subfield['type'] ?? '', 'color'); ?>><?php _e('Color Picker', 'custom-advance-repeater'); ?></option>
+                        <option value="date" <?php selected($subfield['type'] ?? '', 'date'); ?>><?php _e('Date Picker', 'custom-advance-repeater'); ?></option>
                         <!-- ADDED: Repeater option for subfields -->
-                        <option value="repeater" <?php selected($subfield['type'] ?? '', 'repeater'); ?>><?php _e('Repeater Field', 'ultimate-repeater-field'); ?></option>
+                        <option value="repeater" <?php selected($subfield['type'] ?? '', 'repeater'); ?>><?php _e('Repeater Field', 'custom-advance-repeater'); ?></option>
                     </select>
                 </div>
                 
                 <div>
-                    <label><?php _e('Field Label', 'ultimate-repeater-field'); ?> *</label>
+                    <label><?php _e('Field Label', 'custom-advance-repeater'); ?> *</label>
                     <input type="text" name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][label]" 
                            value="<?php echo esc_attr($subfield['label'] ?? ''); ?>" 
                            class="widefat" required>
                 </div>
                 
                 <div>
-                    <label><?php _e('Field Name', 'ultimate-repeater-field'); ?> *</label>
+                    <label><?php _e('Field Name', 'custom-advance-repeater'); ?> *</label>
                     <input type="text" name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][name]" 
                            value="<?php echo esc_attr($subfield['name'] ?? ''); ?>" 
                            class="widefat" required>
-                    <p class="description"><?php _e('Lowercase, underscores, no spaces', 'ultimate-repeater-field'); ?></p>
+                    <p class="description"><?php _e('Lowercase, underscores, no spaces', 'custom-advance-repeater'); ?></p>
                 </div>
             </div>
             
-            <div class="urf-subfield-options" style="display: <?php echo in_array($subfield['type'] ?? '', ['select', 'checkbox', 'radio', 'repeater']) ? 'block' : 'none'; ?>; margin-bottom: 10px;">
+            <div class="car-subfield-options" style="display: <?php echo in_array($subfield['type'] ?? '', ['select', 'checkbox', 'radio', 'repeater']) ? 'block' : 'none'; ?>; margin-bottom: 10px;">
                 <?php if (in_array($subfield['type'] ?? '', ['select', 'checkbox', 'radio'])): ?>
-					<label><?php _e('Options', 'ultimate-repeater-field'); ?></label>
+					<label><?php _e('Options', 'custom-advance-repeater'); ?></label>
 					<?php
 					$options_text = '';
 					if (!empty($subfield['options'])) {
@@ -1546,11 +1544,11 @@ class Ultimate_Repeater_Field {
 					}
 					?>
 					<textarea name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][options]" class="widefat" rows="2"><?php echo esc_textarea($options_text); ?></textarea>
-					<p class="description"><?php _e('Enter options one per line.', 'ultimate-repeater-field'); ?></p>
+					<p class="description"><?php _e('Enter options one per line.', 'custom-advance-repeater'); ?></p>
 
                 <?php elseif (($subfield['type'] ?? '') === 'repeater'): ?>
-                    <label><?php _e('Sub Fields', 'ultimate-repeater-field'); ?></label>
-                    <div class="urf-subfields-container" data-parent-index="<?php echo $parent_index; ?>" data-sub-index="<?php echo $sub_index; ?>">
+                    <label><?php _e('Sub Fields', 'custom-advance-repeater'); ?></label>
+                    <div class="car-subfields-container" data-parent-index="<?php echo $parent_index; ?>" data-sub-index="<?php echo $sub_index; ?>">
                         <?php
                         if (isset($subfield['subfields']) && is_array($subfield['subfields'])) {
                             foreach ($subfield['subfields'] as $nested_sub_index => $nested_subfield) {
@@ -1559,17 +1557,17 @@ class Ultimate_Repeater_Field {
                         }
                         ?>
                     </div>
-                    <button type="button" class="button button-small urf-add-nested-subfield" data-parent-index="<?php echo $parent_index; ?>" data-sub-index="<?php echo $sub_index; ?>">
-                        <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'ultimate-repeater-field'); ?>
+                    <button type="button" class="button button-small car-add-nested-subfield" data-parent-index="<?php echo $parent_index; ?>" data-sub-index="<?php echo $sub_index; ?>">
+                        <span class="dashicons dashicons-plus"></span> <?php _e('Add Sub Field', 'custom-advance-repeater'); ?>
                     </button>
-                    <p class="description"><?php _e('Add fields that will appear inside this repeater', 'ultimate-repeater-field'); ?></p>
+                    <p class="description"><?php _e('Add fields that will appear inside this repeater', 'custom-advance-repeater'); ?></p>
                 <?php endif; ?>
             </div>
             
             <div>
                 <label>
                     <input type="checkbox" name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][required]" value="1" <?php checked($subfield['required'] ?? false, true); ?>>
-                    <?php _e('Required Field', 'ultimate-repeater-field'); ?>
+                    <?php _e('Required Field', 'custom-advance-repeater'); ?>
                 </label>
             </div>
         </div>
@@ -1579,47 +1577,47 @@ class Ultimate_Repeater_Field {
     // NEW FUNCTION: Render nested subfield row
     public function render_nested_subfield_row($parent_index, $sub_index, $nested_index, $subfield = array()) {
         ?>
-        <div class="urf-nested-subfield-row" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: #f0f0f0;">
+        <div class="car-nested-subfield-row" style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; background: #f0f0f0;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <strong><?php _e('Nested Sub Field', 'ultimate-repeater-field'); ?></strong>
-                <a href="#" class="urf-remove-nested-subfield" style="color: #dc3232; text-decoration: none;">
-                    <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'ultimate-repeater-field'); ?>
+                <strong><?php _e('Nested Sub Field', 'custom-advance-repeater'); ?></strong>
+                <a href="#" class="car-remove-nested-subfield" style="color: #dc3232; text-decoration: none;">
+                    <span class="dashicons dashicons-trash"></span> <?php _e('Remove', 'custom-advance-repeater'); ?>
                 </a>
             </div>
             
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 10px;">
                 <div>
-                    <label><?php _e('Field Type', 'ultimate-repeater-field'); ?> *</label>
+                    <label><?php _e('Field Type', 'custom-advance-repeater'); ?> *</label>
                     <select name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][subfields][<?php echo $nested_index; ?>][type]" class="widefat" required>
-                        <option value="text" <?php selected($subfield['type'] ?? '', 'text'); ?>><?php _e('Text', 'ultimate-repeater-field'); ?></option>
-                        <option value="textarea" <?php selected($subfield['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'ultimate-repeater-field'); ?></option>
-                        <option value="image" <?php selected($subfield['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'ultimate-repeater-field'); ?></option>
-                        <option value="select" <?php selected($subfield['type'] ?? '', 'select'); ?>><?php _e('Select Dropdown', 'ultimate-repeater-field'); ?></option>
-                        <option value="checkbox" <?php selected($subfield['type'] ?? '', 'checkbox'); ?>><?php _e('Checkbox', 'ultimate-repeater-field'); ?></option>
-                        <option value="radio" <?php selected($subfield['type'] ?? '', 'radio'); ?>><?php _e('Radio Buttons', 'ultimate-repeater-field'); ?></option>
+                        <option value="text" <?php selected($subfield['type'] ?? '', 'text'); ?>><?php _e('Text', 'custom-advance-repeater'); ?></option>
+                        <option value="textarea" <?php selected($subfield['type'] ?? '', 'textarea'); ?>><?php _e('Textarea', 'custom-advance-repeater'); ?></option>
+                        <option value="image" <?php selected($subfield['type'] ?? '', 'image'); ?>><?php _e('Image Upload', 'custom-advance-repeater'); ?></option>
+                        <option value="select" <?php selected($subfield['type'] ?? '', 'select'); ?>><?php _e('Select Dropdown', 'custom-advance-repeater'); ?></option>
+                        <option value="checkbox" <?php selected($subfield['type'] ?? '', 'checkbox'); ?>><?php _e('Checkbox', 'custom-advance-repeater'); ?></option>
+                        <option value="radio" <?php selected($subfield['type'] ?? '', 'radio'); ?>><?php _e('Radio Buttons', 'custom-advance-repeater'); ?></option>
                     </select>
                 </div>
                 
                 <div>
-                    <label><?php _e('Field Label', 'ultimate-repeater-field'); ?> *</label>
+                    <label><?php _e('Field Label', 'custom-advance-repeater'); ?> *</label>
                     <input type="text" name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][subfields][<?php echo $nested_index; ?>][label]" 
                            value="<?php echo esc_attr($subfield['label'] ?? ''); ?>" 
                            class="widefat" required>
                 </div>
                 
                 <div>
-                    <label><?php _e('Field Name', 'ultimate-repeater-field'); ?> *</label>
+                    <label><?php _e('Field Name', 'custom-advance-repeater'); ?> *</label>
                     <input type="text" name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][subfields][<?php echo $nested_index; ?>][name]" 
                            value="<?php echo esc_attr($subfield['name'] ?? ''); ?>" 
                            class="widefat" required>
-                    <p class="description"><?php _e('Lowercase, underscores, no spaces', 'ultimate-repeater-field'); ?></p>
+                    <p class="description"><?php _e('Lowercase, underscores, no spaces', 'custom-advance-repeater'); ?></p>
                 </div>
             </div>
             
             <div>
                 <label>
                     <input type="checkbox" name="fields[<?php echo $parent_index; ?>][subfields][<?php echo $sub_index; ?>][subfields][<?php echo $nested_index; ?>][required]" value="1" <?php checked($subfield['required'] ?? false, true); ?>>
-                    <?php _e('Required Field', 'ultimate-repeater-field'); ?>
+                    <?php _e('Required Field', 'custom-advance-repeater'); ?>
                 </label>
             </div>
         </div>
@@ -1628,7 +1626,7 @@ class Ultimate_Repeater_Field {
     
     public function save_field_group() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         
         $this->check_and_update_database();
         
@@ -1657,11 +1655,11 @@ class Ultimate_Repeater_Field {
         }
         
         if (empty($name)) {
-            return __('Group name is required!', 'ultimate-repeater-field');
+            return __('Group name is required!', 'custom-advance-repeater');
         }
         
         if (empty($slug)) {
-            return __('Group slug is required!', 'ultimate-repeater-field');
+            return __('Group slug is required!', 'custom-advance-repeater');
         }
         
         $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
@@ -1669,7 +1667,7 @@ class Ultimate_Repeater_Field {
             $this->activate();
             $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
             if (!$table_exists) {
-                return __('Database table does not exist. Please deactivate and reactivate the plugin.', 'ultimate-repeater-field');
+                return __('Database table does not exist. Please deactivate and reactivate the plugin.', 'custom-advance-repeater');
             }
         }
         
@@ -1680,7 +1678,7 @@ class Ultimate_Repeater_Field {
             ));
             
             if ($existing) {
-                return __('A field group with this slug already exists!', 'ultimate-repeater-field');
+                return __('A field group with this slug already exists!', 'custom-advance-repeater');
             }
         } else {
             $existing = $wpdb->get_var($wpdb->prepare(
@@ -1690,7 +1688,7 @@ class Ultimate_Repeater_Field {
             ));
             
             if ($existing) {
-                return __('A field group with this slug already exists!', 'ultimate-repeater-field');
+                return __('A field group with this slug already exists!', 'custom-advance-repeater');
             }
         }
         
@@ -1818,13 +1816,13 @@ class Ultimate_Repeater_Field {
         }
         
         if (empty($fields)) {
-            return __('Please add at least one field!', 'ultimate-repeater-field');
+            return __('Please add at least one field!', 'custom-advance-repeater');
         }
         
         $field_names = array();
         foreach ($fields as $field) {
             if (in_array($field['name'], $field_names)) {
-                return __('Duplicate field name found: ' . $field['name'], 'ultimate-repeater-field');
+                return __('Duplicate field name found: ' . $field['name'], 'custom-advance-repeater');
             }
             $field_names[] = $field['name'];
         }
@@ -1859,12 +1857,12 @@ class Ultimate_Repeater_Field {
         if ($group_id) {
             $result = $wpdb->update($table_name, $data, array('id' => $group_id), $format, array('%d'));
             if ($result === false) {
-                return __('Error updating field group!', 'ultimate-repeater-field');
+                return __('Error updating field group!', 'custom-advance-repeater');
             }
         } else {
             $result = $wpdb->insert($table_name, $data, $format);
             if ($result === false) {
-                return __('Error creating field group!', 'ultimate-repeater-field');
+                return __('Error creating field group!', 'custom-advance-repeater');
             }
             $group_id = $wpdb->insert_id;
         }
@@ -1874,12 +1872,12 @@ class Ultimate_Repeater_Field {
     
     public function get_field_group($id) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE id = %d", $id));
     }
     
     public function admin_enqueue_scripts($hook) {
-        if (!in_array($hook, array('post.php', 'post-new.php')) && strpos($hook, 'ultimate-repeater') === false) {
+        if (!in_array($hook, array('post.php', 'post-new.php')) && strpos($hook, 'custom-advance-repeater') === false) {
             return;
         }
         
@@ -1997,8 +1995,9 @@ class Ultimate_Repeater_Field {
         }
 
         .ui-datepicker-calendar td a:hover {
-            background: #f0f0f0;
+            background: #0073aa;
             border-color: #ddd;
+			color: #fff;
         }
 
         .ui-datepicker-calendar td .ui-state-active {
@@ -2015,7 +2014,6 @@ class Ultimate_Repeater_Field {
 
         .ui-datepicker-calendar td .ui-state-default {
             border: 1px solid #e0e0e0;
-            background: white;
         }
 
         .ui-datepicker-calendar td.ui-datepicker-other-month a {
@@ -2064,17 +2062,17 @@ class Ultimate_Repeater_Field {
         }
 
         /* Fix for nested datepickers */
-        .urf-nested-table .ui-datepicker {
+        .car-nested-table .ui-datepicker {
             width: 280px !important;
             font-size: 12px !important;
         }
 
-        .urf-nested-table .ui-datepicker-calendar td a {
+        .car-nested-table .ui-datepicker-calendar td a {
             padding: 6px !important;
             font-size: 11px !important;
         }
 
-        .urf-nested-table .ui-datepicker-calendar th {
+        .car-nested-table .ui-datepicker-calendar th {
             padding: 6px 0 !important;
             font-size: 11px !important;
         }
@@ -2097,13 +2095,13 @@ class Ultimate_Repeater_Field {
         }
 
         /* Fix for datepicker in tables */
-        .urf-nested-table .hasDatepicker {
+        .car-nested-table .hasDatepicker {
             width: 100% !important;
             box-sizing: border-box !important;
         }
 
-        /* Additional URF styles remain the same */
-        .urf-field-group {
+        /* Additional Custom Advance Repeater styles remain the same */
+        .car-field-group {
             margin: 25px 0;
             background: #fff;
             border-radius: 12px;
@@ -2113,7 +2111,7 @@ class Ultimate_Repeater_Field {
             padding: 25px;
         }
 
-        .urf-field-group h2 {
+        .car-field-group h2 {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 18px 20px;
@@ -2127,7 +2125,7 @@ class Ultimate_Repeater_Field {
             position: relative;
         }
 
-        .urf-vertical-fields {
+        .car-vertical-fields {
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             border-radius: 12px;
             padding: 25px;
@@ -2138,7 +2136,7 @@ class Ultimate_Repeater_Field {
             overflow: hidden;
         }
 
-        .urf-vertical-fields::before {
+        .car-vertical-fields::before {
             content: '';
             position: absolute;
             top: 0;
@@ -2156,7 +2154,7 @@ class Ultimate_Repeater_Field {
             100% { background-position: 0% 50%; }
         }
 
-        .urf-vertical-field {
+        .car-vertical-field {
             background: white;
             padding: 20px;
             border-radius: 10px;
@@ -2168,17 +2166,17 @@ class Ultimate_Repeater_Field {
             overflow: hidden;
         }
 
-        .urf-vertical-field:last-child {
+        .car-vertical-field:last-child {
             margin-bottom: 0;
         }
 
-        .urf-vertical-field:hover {
+        .car-vertical-field:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
             border-color: #cbd5e1;
         }
 
-        .urf-vertical-field::after {
+        .car-vertical-field::after {
             content: '';
             position: absolute;
             left: 0;
@@ -2190,11 +2188,11 @@ class Ultimate_Repeater_Field {
             transition: opacity 0.3s ease;
         }
 
-        .urf-vertical-field:hover::after {
+        .car-vertical-field:hover::after {
             opacity: 1;
         }
 
-        .urf-vertical-field label {
+        .car-vertical-field label {
             display: block;
             font-weight: 700;
             font-size: 15px;
@@ -2207,15 +2205,15 @@ class Ultimate_Repeater_Field {
             gap: 8px;
         }
 
-        .urf-vertical-field label::before {
+        .car-vertical-field label::before {
             content: '📋';
             font-size: 16px;
             opacity: 0.7;
         }
 
-        .urf-vertical-field input[type="text"],
-        .urf-vertical-field textarea,
-        .urf-vertical-field select {
+        .car-vertical-field input[type="text"],
+        .car-vertical-field textarea,
+        .car-vertical-field select {
             width: 100%;
             max-width: 100%;
             box-sizing: border-box;
@@ -2228,26 +2226,26 @@ class Ultimate_Repeater_Field {
             color: #334155;
         }
 
-        .urf-vertical-field input[type="text"]:focus,
-        .urf-vertical-field textarea:focus,
-        .urf-vertical-field select:focus {
+        .car-vertical-field input[type="text"]:focus,
+        .car-vertical-field textarea:focus,
+        .car-vertical-field select:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             background: #f8fafc;
         }
 
-        .urf-vertical-field textarea {
+        .car-vertical-field textarea {
             min-height: 120px;
             resize: vertical;
             line-height: 1.6;
         }
 
-        .urf-file-upload-container {
+        .car-file-upload-container {
             margin-top: 10px;
         }
 
-        .urf-upload-button {
+        .car-upload-button {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
             color: white !important;
             border: none !important;
@@ -2263,19 +2261,19 @@ class Ultimate_Repeater_Field {
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
         }
 
-        .urf-upload-button:hover {
+        .car-upload-button:hover {
             transform: translateY(-2px) !important;
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
         }
 
-        .urf-file-preview {
+        .car-file-preview {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
             margin-top: 20px;
         }
 
-        .urf-file-item {
+        .car-file-item {
             position: relative;
             border: 2px solid #e2e8f0;
             padding: 10px;
@@ -2286,20 +2284,20 @@ class Ultimate_Repeater_Field {
             box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
         }
 
-        .urf-file-item:hover {
+        .car-file-item:hover {
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
             border-color: #667eea;
         }
 
-        .urf-image-preview {
+        .car-image-preview {
             max-width: 100%;
             height: auto;
             display: block;
             border-radius: 6px;
         }
 
-        .urf-remove-file {
+        .car-remove-file {
             position: absolute;
             top: -8px;
             right: -8px;
@@ -2321,7 +2319,7 @@ class Ultimate_Repeater_Field {
         }
 
         /* NESTED REPEATER STYLES */
-        .urf-nested-repeater {
+        .car-nested-repeater {
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             padding: 20px;
             border-radius: 12px;
@@ -2332,7 +2330,7 @@ class Ultimate_Repeater_Field {
         }
 
         /* LEVEL 1 TABLE STYLES */
-        .urf-nested-table {
+        .car-nested-table {
             background: white;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
@@ -2343,7 +2341,7 @@ class Ultimate_Repeater_Field {
             margin: 10px 0;
         }
 
-        .urf-nested-table th {
+        .car-nested-table th {
             background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%) !important;
             color: white;
             padding: 14px 12px;
@@ -2354,7 +2352,7 @@ class Ultimate_Repeater_Field {
             border-bottom: 2px solid #3d8b40;
         }
 
-        .urf-nested-table td {
+        .car-nested-table td {
             padding: 12px;
             background: white;
             border-bottom: 1px solid #f1f5f9;
@@ -2362,15 +2360,15 @@ class Ultimate_Repeater_Field {
             position: relative;
         }
 
-        .urf-nested-table tr:last-child td {
+        .car-nested-table tr:last-child td {
             border-bottom: none;
         }
 
-        .urf-nested-table tr:hover td {
+        .car-nested-table tr:hover td {
             background-color: #f8fafc;
         }
 
-        .urf-row-handle {
+        .car-row-handle {
             width: 60px;
             text-align: center;
             cursor: move;
@@ -2379,7 +2377,7 @@ class Ultimate_Repeater_Field {
             border-right: 1px solid #f0f4f8;
         }
 
-        .urf-row-actions {
+        .car-row-actions {
             width: 80px;
             text-align: center;
             background: linear-gradient(135deg, #f6f8ff 0%, #f0f4ff 100%);
@@ -2388,7 +2386,7 @@ class Ultimate_Repeater_Field {
         }
 
         /* LEVEL 2 NESTED REPEATER STYLES */
-        .urf-nested-repeater .urf-nested-repeater {
+        .car-nested-repeater .car-nested-repeater {
             background: linear-gradient(135deg, #f1f8ff 0%, #e8f4ff 100%);
             padding: 15px;
             border-radius: 8px;
@@ -2396,43 +2394,43 @@ class Ultimate_Repeater_Field {
             margin: 10px 0;
         }
 
-        .urf-nested-repeater .urf-nested-table {
+        .car-nested-repeater .car-nested-table {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
         }
 
-        .urf-nested-repeater .urf-nested-table th {
+        .car-nested-repeater .car-nested-table th {
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
             padding: 12px 10px;
             font-size: 13px;
             border-bottom: 2px solid #1d4ed8;
         }
 
-        .urf-nested-repeater .urf-nested-table td {
+        .car-nested-repeater .car-nested-table td {
             padding: 10px;
             background: #f8fafc;
             border-bottom: 1px solid #e2e8f0;
         }
 
         /* FIX FOR INPUTS IN TABLES */
-        .urf-nested-table input[type="text"],
-        .urf-nested-table textarea,
-        .urf-nested-table select,
-        .urf-nested-table .urf-file-upload-container,
-        .urf-nested-table .urf-upload-button,
-        .urf-nested-table .urf-colorpicker,
-        .urf-nested-table .urf-datepicker {
+        .car-nested-table input[type="text"],
+        .car-nested-table textarea,
+        .car-nested-table select,
+        .car-nested-table .car-file-upload-container,
+        .car-nested-table .car-upload-button,
+        .car-nested-table .car-colorpicker,
+        .car-nested-table .car-datepicker {
             width: 100% !important;
             box-sizing: border-box !important;
             margin: 0 !important;
             display: block !important;
         }
 
-        .urf-nested-table input[type="text"],
-        .urf-nested-table textarea,
-        .urf-nested-table select {
+        .car-nested-table input[type="text"],
+        .car-nested-table textarea,
+        .car-nested-table select {
             padding: 10px 12px !important;
             border: 2px solid #e2e8f0 !important;
             border-radius: 6px !important;
@@ -2441,47 +2439,47 @@ class Ultimate_Repeater_Field {
             min-height: 44px !important;
         }
 
-        .urf-nested-table textarea {
+        .car-nested-table textarea {
             min-height: 80px !important;
             resize: vertical !important;
         }
 
-        .urf-nested-table .urf-file-upload-container {
+        .car-nested-table .car-file-upload-container {
             margin-top: 5px !important;
         }
 
-        .urf-nested-table .urf-upload-button {
+        .car-nested-table .car-upload-button {
             padding: 8px 16px !important;
             font-size: 13px !important;
             margin-top: 5px !important;
         }
 
-        .urf-nested-table .urf-colorpicker {
+        .car-nested-table .car-colorpicker {
             height: 44px !important;
         }
 
-        .urf-nested-table .urf-datepicker {
+        .car-nested-table .car-datepicker {
             cursor: pointer !important;
         }
 
         /* FILE PREVIEWS IN TABLES */
-        .urf-nested-table .urf-file-preview {
+        .car-nested-table .car-file-preview {
             margin: 10px 0 5px 0 !important;
         }
 
-        .urf-nested-table .urf-file-item {
+        .car-nested-table .car-file-item {
             max-width: 150px !important;
             margin: 5px 0 !important;
             padding: 8px !important;
         }
 
-        .urf-nested-table .urf-image-preview {
+        .car-nested-table .car-image-preview {
             max-height: 100px !important;
         }
 
         /* ADD ROW BUTTONS */
-        .urf-add-nested-row,
-        .urf-add-nested2-row {
+        .car-add-nested-row,
+        .car-add-nested2-row {
             margin: 15px 0 10px !important;
             padding: 10px 20px !important;
             font-size: 13px !important;
@@ -2497,42 +2495,42 @@ class Ultimate_Repeater_Field {
             cursor: pointer !important;
         }
 
-        .urf-add-nested-row {
+        .car-add-nested-row {
             background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%) !important;
             color: white !important;
             box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3) !important;
         }
 
-        .urf-add-nested2-row {
+        .car-add-nested2-row {
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
             color: white !important;
             box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3) !important;
         }
 
-        .urf-add-nested-row:hover,
-        .urf-add-nested2-row:hover {
+        .car-add-nested-row:hover,
+        .car-add-nested2-row:hover {
             transform: translateY(-2px) !important;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15) !important;
         }
 
         /* SORTABLE AND DRAG HANDLES */
-        .urf-row-handle {
+        .car-row-handle {
             width: 50px;
             text-align: center;
             cursor: move;
             position: relative;
         }
 
-        .urf-row-handle .dashicons-menu {
+        .car-row-handle .dashicons-menu {
             color: #94a3b8;
             font-size: 20px;
         }
 
-        .urf-row-handle:hover .dashicons-menu {
+        .car-row-handle:hover .dashicons-menu {
             color: #64748b;
         }
 
-        .urf-sortable-placeholder {
+        .car-sortable-placeholder {
             background: #f0f4ff !important;
             border: 2px dashed #667eea !important;
             height: 60px !important;
@@ -2540,8 +2538,8 @@ class Ultimate_Repeater_Field {
         }
 
         /* REMOVE BUTTONS */
-        .urf-remove-nested-row,
-        .urf-remove-nested2-row {
+        .car-remove-nested-row,
+        .car-remove-nested2-row {
             color: #dc2626 !important;
             text-decoration: none !important;
             cursor: pointer !important;
@@ -2553,8 +2551,8 @@ class Ultimate_Repeater_Field {
             border: none !important;
         }
 
-        .urf-remove-nested-row:hover,
-        .urf-remove-nested2-row:hover {
+        .car-remove-nested-row:hover,
+        .car-remove-nested2-row:hover {
             color: #b91c1c !important;
             background: #fee2e2 !important;
             transform: scale(1.1);
@@ -2562,62 +2560,62 @@ class Ultimate_Repeater_Field {
 
         /* RESPONSIVE DESIGN */
         @media (max-width: 1200px) {
-            .urf-nested-table-container {
+            .car-nested-table-container {
                 overflow-x: auto;
             }
             
-            .urf-nested-table {
+            .car-nested-table {
                 min-width: 800px;
             }
         }
 
         @media (max-width: 768px) {
-            .urf-field-group {
+            .car-field-group {
                 padding: 15px;
                 margin: 15px 0;
             }
             
-            .urf-vertical-fields {
+            .car-vertical-fields {
                 padding: 15px;
             }
             
-            .urf-vertical-field {
+            .car-vertical-field {
                 padding: 15px;
             }
             
-            .urf-nested-repeater {
+            .car-nested-repeater {
                 padding: 15px;
             }
             
-            .urf-add-nested-row,
-            .urf-add-nested2-row {
+            .car-add-nested-row,
+            .car-add-nested2-row {
                 padding: 8px 16px !important;
                 font-size: 12px !important;
             }
         }
 
         /* FIX FOR NESTED2 IN TABLES - SPECIFIC FIX */
-        .urf-nested-repeater .urf-nested-table td .urf-nested-repeater {
+        .car-nested-repeater .car-nested-table td .car-nested-repeater {
             margin: 10px 0 0 0 !important;
             padding: 12px !important;
         }
 
-        .urf-nested-repeater .urf-nested-table .urf-add-nested2-row {
+        .car-nested-repeater .car-nested-table .car-add-nested2-row {
             margin: 10px 0 5px 0 !important;
             padding: 8px 16px !important;
             font-size: 12px !important;
         }
 
         /* Ensure proper cell widths */
-        .urf-nested-table th:first-child,
-        .urf-nested-table td:first-child {
+        .car-nested-table th:first-child,
+        .car-nested-table td:first-child {
             width: 60px;
             min-width: 60px;
             max-width: 60px;
         }
 
-        .urf-nested-table th:last-child,
-        .urf-nested-table td:last-child {
+        .car-nested-table th:last-child,
+        .car-nested-table td:last-child {
             width: 80px;
             min-width: 80px;
             max-width: 80px;
@@ -2638,29 +2636,29 @@ class Ultimate_Repeater_Field {
         }
 
         /* Hover effects for better UX */
-        .urf-nested-tbody tr {
+        .car-nested-tbody tr {
             transition: background-color 0.2s ease;
         }
 
-        .urf-nested-tbody tr:hover {
+        .car-nested-tbody tr:hover {
             background-color: #f8fafc;
         }
 
         /* Color picker fix */
-        .urf-nested-table .wp-picker-container {
+        .car-nested-table .wp-picker-container {
             width: 100% !important;
         }
 
-        .urf-nested-table .wp-picker-input-wrap {
+        .car-nested-table .wp-picker-input-wrap {
             width: 100% !important;
         }
 
-        .urf-nested-table .wp-picker-input-wrap input[type="text"] {
+        .car-nested-table .wp-picker-input-wrap input[type="text"] {
             width: 100% !important;
         }
 
         /* Date picker fix - Enhanced */
-        .urf-nested-table .hasDatepicker {
+        .car-nested-table .hasDatepicker {
             background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="%2364748b" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>') no-repeat right 10px center !important;
             background-size: 20px !important;
             padding-right: 40px !important;
@@ -2668,17 +2666,17 @@ class Ultimate_Repeater_Field {
         }
 
         /* Fix for datepicker in nested tables */
-        .urf-nested-table .ui-datepicker {
+        .car-nested-table .ui-datepicker {
             font-size: 13px !important;
             min-width: 280px !important;
         }
 
-        .urf-nested-table .ui-datepicker-calendar th {
+        .car-nested-table .ui-datepicker-calendar th {
             padding: 6px 0 !important;
             font-size: 11px !important;
         }
 
-        .urf-nested-table .ui-datepicker-calendar td a {
+        .car-nested-table .ui-datepicker-calendar td a {
             padding: 6px !important;
             font-size: 11px !important;
         }
@@ -2686,13 +2684,13 @@ class Ultimate_Repeater_Field {
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('URF: DOM loaded, starting initialization');
+            console.log('Custom Advance Repeater: DOM loaded, starting initialization');
             
             (function($) {
                 'use strict';
                 
-                function urfLog(msg) {
-                    console.log('URF: ' + msg);
+                function carLog(msg) {
+                    console.log('Custom Advance Repeater: ' + msg);
                 }
                 
                 function isJQueryUILoaded() {
@@ -2708,12 +2706,12 @@ class Ultimate_Repeater_Field {
                     function check() {
                         attempts++;
                         if (isJQueryUILoaded()) {
-                            urfLog('jQuery UI loaded successfully');
+                            carLog('jQuery UI loaded successfully');
                             callback(true);
                         } else if (attempts < maxAttempts) {
                             setTimeout(check, 500);
                         } else {
-                            urfLog('ERROR: jQuery UI not loaded after ' + maxAttempts + ' attempts');
+                            carLog('ERROR: jQuery UI not loaded after ' + maxAttempts + ' attempts');
                             callback(false);
                         }
                     }
@@ -2724,7 +2722,7 @@ class Ultimate_Repeater_Field {
                 function initDatepicker() {
                     if (typeof $.fn.datepicker === 'function') {
                         // Initialize all datepickers with proper calendar settings
-                        $('.urf-datepicker').datepicker({
+                        $('.car-datepicker').datepicker({
                             dateFormat: 'yy-mm-dd',
                             changeMonth: true,
                             changeYear: true,
@@ -2780,44 +2778,44 @@ class Ultimate_Repeater_Field {
                             }
                         });
                         
-                        urfLog('Datepickers initialized with calendar fix');
+                        carLog('Datepickers initialized with calendar fix');
                     } else {
-                        urfLog('ERROR: Datepicker function not available');
+                        carLog('ERROR: Datepicker function not available');
                     }
                 }
                 
                 function initColorpicker() {
                     if (typeof $.fn.wpColorPicker === 'function') {
-                        $('.urf-colorpicker').each(function() {
+                        $('.car-colorpicker').each(function() {
                             if (!$(this).hasClass('wp-color-picker')) {
                                 $(this).wpColorPicker();
                             }
                         });
-                        urfLog('Colorpickers initialized');
+                        carLog('Colorpickers initialized');
                     }
                 }
                 
                 function initImageUpload() {
                     // Use event delegation for dynamically created upload buttons
-                    $(document).on('click', '.urf-upload-button', function(e) {
+                    $(document).on('click', '.car-upload-button', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
                         var $button = $(this);
-                        var $container = $button.closest('.urf-file-upload-container');
-                        var $input = $container.find('.urf-file-input');
-                        var $preview = $container.find('.urf-file-preview');
+                        var $container = $button.closest('.car-file-upload-container');
+                        var $input = $container.find('.car-file-input');
+                        var $preview = $container.find('.car-file-preview');
                         var maxFiles = $button.data('max') || 1;
                         var currentFiles = $preview.children().length;
                         
                         if (currentFiles >= maxFiles && maxFiles > 0) {
-                            alert('<?php _e('Maximum images reached', 'ultimate-repeater-field'); ?>');
+                            alert('<?php _e('Maximum images reached', 'custom-advance-repeater'); ?>');
                             return;
                         }
                         
                         var frame = wp.media({
-                            title: '<?php _e('Select or Upload Image', 'ultimate-repeater-field'); ?>',
-                            button: { text: '<?php _e('Use this image', 'ultimate-repeater-field'); ?>' },
+                            title: '<?php _e('Select or Upload Image', 'custom-advance-repeater'); ?>',
+                            button: { text: '<?php _e('Use this image', 'custom-advance-repeater'); ?>' },
                             library: { type: 'image' },
                             multiple: maxFiles > 1
                         });
@@ -2832,10 +2830,10 @@ class Ultimate_Repeater_Field {
                             
                             $.each(attachments, function(i, attachment) {
                                 if (attachment.type === 'image') {
-                                    var fileHtml = '<div class="urf-file-item" data-attachment-id="' + attachment.id + '">' +
-                                        '<img src="' + attachment.url + '" class="urf-image-preview">' +
-                                        '<div class="urf-file-name">' + attachment.filename + '</div>' +
-                                        '<button type="button" class="urf-remove-file dashicons dashicons-no-alt" title="<?php _e('Remove', 'ultimate-repeater-field'); ?>"></button>' +
+                                    var fileHtml = '<div class="car-file-item" data-attachment-id="' + attachment.id + '">' +
+                                        '<img src="' + attachment.url + '" class="car-image-preview">' +
+                                        '<div class="car-file-name">' + attachment.filename + '</div>' +
+                                        '<button type="button" class="car-remove-file dashicons dashicons-no-alt" title="<?php _e('Remove', 'custom-advance-repeater'); ?>"></button>' +
                                         '</div>';
                                     
                                     $preview.append(fileHtml);
@@ -2866,14 +2864,14 @@ class Ultimate_Repeater_Field {
                     });
                     
                     // Remove file event
-                    $(document).on('click', '.urf-remove-file', function(e) {
+                    $(document).on('click', '.car-remove-file', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
                         var $removeBtn = $(this);
-                        var $fileItem = $removeBtn.closest('.urf-file-item');
-                        var $container = $fileItem.closest('.urf-file-upload-container');
-                        var $input = $container.find('.urf-file-input');
+                        var $fileItem = $removeBtn.closest('.car-file-item');
+                        var $container = $fileItem.closest('.car-file-upload-container');
+                        var $input = $container.find('.car-file-input');
                         
                         if ($input.hasClass('multiple-images')) {
                             // Handle multiple images
@@ -2900,16 +2898,16 @@ class Ultimate_Repeater_Field {
                 // ==============================================
                 
                 function initNestedRepeaters() {
-                    console.log('[URF] Initializing level 1 repeaters...');
+                    console.log('[Custom Advance Repeater] Initializing level 1 repeaters...');
                     
                     // Helper function to get proper row count
                     function getRowCount($tbody) {
-                        return $tbody.find('tr[data-nested-index]').not('.urf-clone-nested-row').length;
+                        return $tbody.find('tr[data-nested-index]').not('.car-clone-nested-row').length;
                     }
                     
                     // Helper function to update row indices
                     function updateRowIndices($tbody, skipFirstRow = false) {
-                        var rows = $tbody.find('tr[data-nested-index]').not('.urf-clone-nested-row');
+                        var rows = $tbody.find('tr[data-nested-index]').not('.car-clone-nested-row');
                         var startIndex = skipFirstRow ? 1 : 0;
                         
                         rows.each(function(newIndex) {
@@ -2919,7 +2917,7 @@ class Ultimate_Repeater_Field {
                             var oldIndex = parseInt($row.data('nested-index'));
                             
                             if (oldIndex !== newIndex) {
-                                console.log('[URF] Reindexing row from', oldIndex, 'to', newIndex);
+                                console.log('[Custom Advance Repeater] Reindexing row from', oldIndex, 'to', newIndex);
                                 
                                 // Update data attribute
                                 $row.data('nested-index', newIndex);
@@ -2929,7 +2927,7 @@ class Ultimate_Repeater_Field {
                                 var $displaySpan = $row.find('.nested-row-index');
                                 if ($displaySpan.length === 0) {
                                     $displaySpan = $('<span>').addClass('nested-row-index');
-                                    $row.find('.urf-row-handle').append($displaySpan);
+                                    $row.find('.car-row-handle').append($displaySpan);
                                 }
                                 $displaySpan.text(newIndex + 1);
                                 
@@ -2956,7 +2954,7 @@ class Ultimate_Repeater_Field {
                     
                     // Fix existing rows on initialization
                     function fixExistingRows() {
-                        $('.urf-nested-tbody').each(function() {
+                        $('.car-nested-tbody').each(function() {
                             var $tbody = $(this);
                             updateRowIndices($tbody);
                         });
@@ -2966,31 +2964,31 @@ class Ultimate_Repeater_Field {
                     fixExistingRows();
                     
                     // Add level 1 nested row - using event delegation with namespace
-                    $(document).off('click.urfAdd').on('click.urfAdd', '.urf-add-nested-row', function(e) {
+                    $(document).off('click.carAdd').on('click.carAdd', '.car-add-nested-row', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
-                        console.log('[URF] Adding new level 1 row...');
+                        console.log('[Custom Advance Repeater] Adding new level 1 row...');
                         
                         var $button = $(this);
-                        var $nestedRepeater = $button.closest('.urf-nested-repeater');
-                        var $table = $nestedRepeater.find('.urf-nested-table');
-                        var $tbody = $table.find('tbody.urf-nested-tbody');
-                        var $cloneRow = $tbody.find('.urf-clone-nested-row');
+                        var $nestedRepeater = $button.closest('.car-nested-repeater');
+                        var $table = $nestedRepeater.find('.car-nested-table');
+                        var $tbody = $table.find('tbody.car-nested-tbody');
+                        var $cloneRow = $tbody.find('.car-clone-nested-row');
                         
                         if ($cloneRow.length === 0) {
-                            console.error('URF: Clone row not found');
+                            console.error('Custom Advance Repeater: Clone row not found');
                             return;
                         }
                         
                         // Get proper row count
                         var nextIndex = getRowCount($tbody);
                         
-                        console.log('[URF] Current row count:', nextIndex, 'New index:', nextIndex);
+                        console.log('[Custom Advance Repeater] Current row count:', nextIndex, 'New index:', nextIndex);
                         
                         // Clone the row
                         var $newRow = $cloneRow.clone();
-                        $newRow.removeClass('urf-clone-nested-row').show();
+                        $newRow.removeClass('car-clone-nested-row').show();
                         
                         // Update all placeholders with new index
                         $newRow.find('[name]').each(function() {
@@ -3019,14 +3017,14 @@ class Ultimate_Repeater_Field {
                         var $displaySpan = $newRow.find('.nested-row-index');
                         if ($displaySpan.length === 0) {
                             $displaySpan = $('<span>').addClass('nested-row-index');
-                            $newRow.find('.urf-row-handle').append($displaySpan);
+                            $newRow.find('.car-row-handle').append($displaySpan);
                         }
                         $displaySpan.text(nextIndex + 1);
                         
                         // Insert before clone row
                         $cloneRow.before($newRow);
                         
-                        console.log('[URF] Added row at index', nextIndex);
+                        console.log('[Custom Advance Repeater] Added row at index', nextIndex);
                         
                         // Reinitialize field controls - including datepicker
                         setTimeout(function() {
@@ -3035,7 +3033,7 @@ class Ultimate_Repeater_Field {
                     });
                     
                     // Remove level 1 nested row - using event delegation with namespace
-                    $(document).off('click.urfRemove').on('click.urfRemove', '.urf-remove-nested-row', function(e) {
+                    $(document).off('click.carRemove').on('click.carRemove', '.car-remove-nested-row', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
@@ -3043,7 +3041,7 @@ class Ultimate_Repeater_Field {
                         if ($(this).data('processing')) return;
                         $(this).data('processing', true);
                         
-                        console.log('[URF] Removing level 1 row...');
+                        console.log('[Custom Advance Repeater] Removing level 1 row...');
                         
                         var $button = $(this);
                         var $row = $button.closest('tr');
@@ -3057,11 +3055,11 @@ class Ultimate_Repeater_Field {
                         };
                         
                         // Single confirmation check
-                        if (window.URF_ConfirmRemove === undefined) {
-                            window.URF_ConfirmRemove = true;
+                        if (window.CAR_ConfirmRemove === undefined) {
+                            window.CAR_ConfirmRemove = true;
                             
                             if (confirm('Are you sure you want to remove this row?')) {
-                                console.log('[URF] Removing row at index', removedIndex);
+                                console.log('[Custom Advance Repeater] Removing row at index', removedIndex);
                                 
                                 // Remove the row
                                 $row.remove();
@@ -3069,11 +3067,11 @@ class Ultimate_Repeater_Field {
                                 // Reindex remaining rows
                                 updateRowIndices($tbody);
                                 
-                                console.log('[URF] Reindexing complete');
+                                console.log('[Custom Advance Repeater] Reindexing complete');
                             }
                             
                             setTimeout(function() {
-                                window.URF_ConfirmRemove = undefined;
+                                window.CAR_ConfirmRemove = undefined;
                             }, 100);
                         }
                         
@@ -3082,39 +3080,39 @@ class Ultimate_Repeater_Field {
                     
                     // Sortable for level 1 - Initialize only once
                     if (typeof $.fn.sortable === 'function') {
-                        $('.urf-nested-tbody').each(function() {
+                        $('.car-nested-tbody').each(function() {
                             var $tbody = $(this);
                             
                             // Check if already sortable
                             if (!$tbody.hasClass('ui-sortable')) {
                                 $tbody.sortable({
-                                    handle: '.urf-row-handle',
+                                    handle: '.car-row-handle',
                                     axis: 'y',
-                                    placeholder: 'urf-sortable-placeholder',
+                                    placeholder: 'car-sortable-placeholder',
                                     forcePlaceholderSize: true,
                                     items: 'tr[data-nested-index]', // Only sort level 1 rows
                                     start: function(e, ui) {
                                         ui.placeholder.height(ui.item.height());
-                                        console.log('[URF] Started sorting level 1 rows');
+                                        console.log('[Custom Advance Repeater] Started sorting level 1 rows');
                                     },
                                     update: function(event, ui) {
-                                        console.log('[URF] Sorting complete, reindexing...');
+                                        console.log('[Custom Advance Repeater] Sorting complete, reindexing...');
                                         var $tbody = $(this);
                                         updateRowIndices($tbody);
-                                        console.log('[URF] Sorting reindex complete');
+                                        console.log('[Custom Advance Repeater] Sorting reindex complete');
                                     }
                                 });
                             }
                         });
                     }
                     
-                    console.log('[URF] Level 1 repeaters initialized');
+                    console.log('[Custom Advance Repeater] Level 1 repeaters initialized');
                 }
 
                 // Helper function to initialize field controls
                 function initFieldControls($row) {
                     // Datepickers - FIXED with proper calendar settings
-                    $row.find('.urf-datepicker').each(function() {
+                    $row.find('.car-datepicker').each(function() {
                         if (typeof $.fn.datepicker === 'function' && !$(this).hasClass('hasDatepicker')) {
                             $(this).datepicker({
                                 dateFormat: 'yy-mm-dd',
@@ -3136,7 +3134,7 @@ class Ultimate_Repeater_Field {
                                             });
                                             
                                             // Fix for nested tables
-                                            if ($(input).closest('.urf-nested-table').length) {
+                                            if ($(input).closest('.car-nested-table').length) {
                                                 inst.dpDiv.css({
                                                     'font-size': '12px',
                                                     'width': '280px'
@@ -3151,7 +3149,7 @@ class Ultimate_Repeater_Field {
                     });
                     
                     // Color pickers
-                    $row.find('.urf-colorpicker').each(function() {
+                    $row.find('.car-colorpicker').each(function() {
                         if (typeof $.fn.wpColorPicker === 'function' && !$(this).hasClass('wp-color-picker')) {
                             $(this).wpColorPicker().addClass('wp-color-picker');
                         }
@@ -3163,16 +3161,16 @@ class Ultimate_Repeater_Field {
 
                 // Initialize on document ready
                 $(document).ready(function() {
-                    console.log('[URF] Document ready, initializing...');
+                    console.log('[Custom Advance Repeater] Document ready, initializing...');
                     
-                    // Clear any existing URF event handlers to prevent duplicates
-                    $(document).off('click.urfAdd');
-                    $(document).off('click.urfRemove');
+                    // Clear any existing Custom Advance Repeater event handlers to prevent duplicates
+                    $(document).off('click.carAdd');
+                    $(document).off('click.carRemove');
                     
                     // Initialize nested repeaters
                     initNestedRepeaters();
                     
-                    console.log('[URF] Initialization complete');
+                    console.log('[Custom Advance Repeater] Initialization complete');
                 });
                 
                 // ==============================================
@@ -3181,15 +3179,15 @@ class Ultimate_Repeater_Field {
 
                 function initNested2Repeaters() {
                     // Add level 2 nested row
-                    $(document).on('click', '.urf-add-nested2-row', function(e) {
+                    $(document).on('click', '.car-add-nested2-row', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
                         var $button = $(this);
-                        var $nested2Repeater = $button.closest('.urf-nested-repeater');
-                        var $table = $nested2Repeater.find('.urf-nested-table');
-                        var $tbody = $table.find('tbody.urf-nested-tbody');
-                        var $cloneRow = $tbody.find('.urf-clone-nested2-row');
+                        var $nested2Repeater = $button.closest('.car-nested-repeater');
+                        var $table = $nested2Repeater.find('.car-nested-table');
+                        var $tbody = $table.find('tbody.car-nested-tbody');
+                        var $cloneRow = $tbody.find('.car-clone-nested2-row');
                         
                         if ($cloneRow.length === 0) {
                             console.error('Nested2 repeater clone row not found');
@@ -3198,7 +3196,7 @@ class Ultimate_Repeater_Field {
                         
                         // FIXED: Use max existing index + 1 to ensure unique, sequential indices
                         var maxIndex = -1;
-                        $tbody.find('tr:not(.urf-clone-nested2-row)').each(function() {
+                        $tbody.find('tr:not(.car-clone-nested2-row)').each(function() {
                             var idx = parseInt($(this).data('nested2-index'));
                             if (!isNaN(idx) && idx > maxIndex) maxIndex = idx;
                         });
@@ -3206,7 +3204,7 @@ class Ultimate_Repeater_Field {
                         console.log('Adding new row at index: ' + nested2RowCount);
                         
                         var $newRow = $cloneRow.clone();
-                        $newRow.removeClass('urf-clone-nested2-row').show();
+                        $newRow.removeClass('car-clone-nested2-row').show();
                         
                         // FIXED: Use parts-based replacement for consistency and reliability
                         $newRow.find('[name]').each(function() {
@@ -3240,7 +3238,7 @@ class Ultimate_Repeater_Field {
                         // Reinitialize all field controls for the new row - including datepicker fix
                         setTimeout(function() {
                             // Datepickers with proper calendar
-                            $newRow.find('.urf-datepicker').each(function() {
+                            $newRow.find('.car-datepicker').each(function() {
                                 if (typeof $.fn.datepicker === 'function' && !$(this).hasClass('hasDatepicker')) {
                                     $(this).datepicker({
                                         dateFormat: 'yy-mm-dd',
@@ -3268,7 +3266,7 @@ class Ultimate_Repeater_Field {
                             });
                             
                             // Color pickers
-                            $newRow.find('.urf-colorpicker').each(function() {
+                            $newRow.find('.car-colorpicker').each(function() {
                                 if (typeof $.fn.wpColorPicker === 'function' && !$(this).hasClass('wp-color-picker')) {
                                     $(this).wpColorPicker().addClass('wp-color-picker');
                                 }
@@ -3281,21 +3279,21 @@ class Ultimate_Repeater_Field {
                     });
                     
                     // Remove level 2 nested row - FIXED: Force full reindexing to 0,1,2,... and use reliable parts-based targeting
-                    $(document).on('click', '.urf-remove-nested2-row', function(e) {
+                    $(document).on('click', '.car-remove-nested2-row', function(e) {
                         e.preventDefault();
                         e.stopPropagation();
                         
                         if ($(this).data('processing')) return;
                         $(this).data('processing', true);
                         
-                        if (confirm('<?php _e('Are you sure you want to remove this nested row?', 'ultimate-repeater-field'); ?>')) {
+                        if (confirm('<?php _e('Are you sure you want to remove this nested row?', 'custom-advance-repeater'); ?>')) {
                             var $row = $(this).closest('tr');
                             var $tbody = $row.closest('tbody');
                             
                             $row.remove();
                             
                             // Force reindexing of all remaining rows to sequential 0,1,2,... (remove the oldIndex check to ensure it always happens)
-                            $tbody.find('tr:not(.urf-clone-nested2-row)').each(function(newIndex) {
+                            $tbody.find('tr:not(.car-clone-nested2-row)').each(function(newIndex) {
                                 var $currentRow = $(this);
                                 
                                 // Always update to ensure sequential indices
@@ -3334,10 +3332,10 @@ class Ultimate_Repeater_Field {
                     
                     // Sortable for level 2 - FIXED: Same force reindexing logic
                     if (typeof $.fn.sortable === 'function') {
-                        $('.urf-nested-tbody').sortable({
-                            handle: '.urf-row-handle',
+                        $('.car-nested-tbody').sortable({
+                            handle: '.car-row-handle',
                             axis: 'y',
-                            placeholder: 'urf-sortable-placeholder',
+                            placeholder: 'car-sortable-placeholder',
                             forcePlaceholderSize: true,
                             start: function(e, ui) {
                                 ui.placeholder.height(ui.item.height());
@@ -3345,7 +3343,7 @@ class Ultimate_Repeater_Field {
                             update: function(event, ui) {
                                 var $tbody = $(this);
                                 // Force reindexing after sorting
-                                $tbody.find('tr:not(.urf-clone-nested2-row)').each(function(newIndex) {
+                                $tbody.find('tr:not(.car-clone-nested2-row)').each(function(newIndex) {
                                     var $currentRow = $(this);
                                     
                                     $currentRow.data('nested2-index', newIndex);
@@ -3369,20 +3367,20 @@ class Ultimate_Repeater_Field {
                         });
                     }
                     
-                    urfLog('Level 2 nested repeaters initialized');
+                    carLog('Level 2 nested repeaters initialized');
                 }
 
                 // ==============================================
                 // MAIN INITIALIZATION FUNCTION
                 // ==============================================
                 
-                function initURF() {
-                    if ($('body').hasClass('urf-initialized')) {
-                        urfLog('URF already initialized, skipping');
+                function initCAR() {
+                    if ($('body').hasClass('car-initialized')) {
+                        carLog('Custom Advance Repeater already initialized, skipping');
                         return;
                     }
                     
-                    urfLog('Starting URF initialization');
+                    carLog('Starting Custom Advance Repeater initialization');
                     
                     waitForJQueryUI(function(success) {
                         if (success) {
@@ -3392,26 +3390,26 @@ class Ultimate_Repeater_Field {
                             initNestedRepeaters();
                             initNested2Repeaters();
                             
-                            $('body').addClass('urf-initialized');
+                            $('body').addClass('car-initialized');
                             
-                            urfLog('URF initialization complete');
+                            carLog('Custom Advance Repeater initialization complete');
                         } else {
-                            urfLog('URF initialization failed - jQuery UI not loaded');
+                            carLog('Custom Advance Repeater initialization failed - jQuery UI not loaded');
                             initImageUpload();
                             initNestedRepeaters();
                             initNested2Repeaters();
-                            $('body').addClass('urf-initialized');
+                            $('body').addClass('car-initialized');
                         }
                     });
                 }
                 
                 // Initialize everything
-                initURF();
+                initCAR();
                 
                 // Reinitialize when new content is added via AJAX
                 $(document).ajaxComplete(function() {
-                    if (!$('body').hasClass('urf-initialized')) {
-                        initURF();
+                    if (!$('body').hasClass('car-initialized')) {
+                        initCAR();
                     }
                 });
                 
@@ -3423,7 +3421,7 @@ class Ultimate_Repeater_Field {
      
     public function add_meta_boxes() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         
         $current_screen = get_current_screen();
         if (!$current_screen) return;
@@ -3433,7 +3431,7 @@ class Ultimate_Repeater_Field {
         foreach ($all_field_groups as $group) {
             if ($this->should_display_field_group($group, get_the_ID())) {
                 add_meta_box(
-                    'urf_field_group_' . $group->slug,
+                    'car_field_group_' . $group->slug,
                     $group->name,
                     array($this, 'render_field_group_meta_box'),
                     $current_screen->post_type,
@@ -3479,7 +3477,7 @@ class Ultimate_Repeater_Field {
     $data = $this->get_field_data($post->ID, $group->slug);
     
     if (empty($fields)) {
-        echo '<p>' . __('No fields configured for this group.', 'ultimate-repeater-field') . '</p>';
+        echo '<p>' . __('No fields configured for this group.', 'custom-advance-repeater') . '</p>';
         return;
     }
     
@@ -3487,21 +3485,21 @@ class Ultimate_Repeater_Field {
     
     ?>
     
-    <div class="urf-field-group" data-group="<?php echo esc_attr($group->slug); ?>">
-        <input type="hidden" name="urf_field_group[]" value="<?php echo esc_attr($group->slug); ?>">
-        <input type="hidden" name="urf_nonce_<?php echo esc_attr($group->slug); ?>" value="<?php echo wp_create_nonce('urf_save_fields_' . $group->slug); ?>">
+    <div class="car-field-group" data-group="<?php echo esc_attr($group->slug); ?>">
+        <input type="hidden" name="car_field_group[]" value="<?php echo esc_attr($group->slug); ?>">
+        <input type="hidden" name="car_nonce_<?php echo esc_attr($group->slug); ?>" value="<?php echo wp_create_nonce('car_save_fields_' . $group->slug); ?>">
         
-        <div class="urf-vertical-fields">
+        <div class="car-vertical-fields">
             <?php foreach ($fields as $field): 
                 $field_name = $field['name'];
                 $field_value = isset($field_values[$field_name]) ? $field_values[$field_name] : '';
                 
                 if ($field['type'] === 'repeater') continue;
                 
-                $input_name = "urf_data[{$group->slug}][{$field_name}]";
-                $input_id = "urf_{$group->slug}_{$field_name}";
+                $input_name = "car_data[{$group->slug}][{$field_name}]";
+                $input_id = "car_{$group->slug}_{$field_name}";
             ?>
-                <div class="urf-vertical-field">
+                <div class="car-vertical-field">
                     <label>
                         <?php echo esc_html($field['label']); ?>
                         <?php if ($field['required'] ?? false): ?>
@@ -3521,7 +3519,7 @@ class Ultimate_Repeater_Field {
                 $repeater_data = isset($data[$field['name']]) ? $data[$field['name']] : array();
                 $subfields = $field['subfields'] ?? array();
             ?>
-                <div class="urf-vertical-field">
+                <div class="car-vertical-field">
                     <label>
                         <?php echo esc_html($field['label']); ?>
                         <?php if ($field['required'] ?? false): ?>
@@ -3529,11 +3527,11 @@ class Ultimate_Repeater_Field {
                         <?php endif; ?>
                     </label>
                     
-                    <div class="urf-nested-repeater" data-field-name="<?php echo esc_attr($field['name']); ?>" data-row-index="0">
-                        <table class="urf-repeater-table urf-nested-table" style="margin-top: 0;">
+                    <div class="car-nested-repeater" data-field-name="<?php echo esc_attr($field['name']); ?>" data-row-index="0">
+                        <table class="car-repeater-table car-nested-table" style="margin-top: 0;">
                             <thead>
                                 <tr>
-                                    <th class="urf-row-handle">#</th>
+                                    <th class="car-row-handle">#</th>
                                     <?php foreach ($subfields as $subfield): ?>
                                         <th><?php echo esc_html($subfield['label']); ?>
                                             <?php if ($subfield['required'] ?? false): ?>
@@ -3541,10 +3539,10 @@ class Ultimate_Repeater_Field {
                                             <?php endif; ?>
                                         </th>
                                     <?php endforeach; ?>
-                                    <th class="urf-row-actions"><?php _e('Actions', 'ultimate-repeater-field'); ?></th>
+                                    <th class="car-row-actions"><?php _e('Actions', 'custom-advance-repeater'); ?></th>
                                 </tr>
                             </thead>
-                            <tbody class="urf-nested-tbody">
+                            <tbody class="car-nested-tbody">
                                 <?php if (!empty($repeater_data)): ?>
                                     <?php foreach ($repeater_data as $nested_index => $nested_row): ?>
                                         <?php $this->render_nested_repeater_row($subfields, $field['name'], $group->slug, 0, $nested_index, $nested_row); ?>
@@ -3557,10 +3555,10 @@ class Ultimate_Repeater_Field {
                         </table>
                         
                         <!-- LEVEL 1 ADD ROW BUTTON -->
-                        <button type="button" class="button button-small urf-add-nested-row" 
+                        <button type="button" class="button button-small car-add-nested-row" 
                                 data-field-name="<?php echo esc_attr($field['name']); ?>" 
                                 data-row-index="0">
-                            <span class="dashicons dashicons-plus"></span> <?php _e('Add Row', 'ultimate-repeater-field'); ?>
+                            <span class="dashicons dashicons-plus"></span> <?php _e('Add Row', 'custom-advance-repeater'); ?>
                         </button>
                     </div>
                 </div>
@@ -3572,7 +3570,7 @@ class Ultimate_Repeater_Field {
     
     public function get_single_field_values($post_id, $group_slug) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_fields';
+        $table_name = $wpdb->prefix . 'car_fields';
         
         $results = $wpdb->get_results($wpdb->prepare(
             "SELECT field_name, field_value FROM $table_name 
@@ -3630,13 +3628,13 @@ class Ultimate_Repeater_Field {
                     $image_value = '';
                 }
                 ?>
-                <div class="urf-file-upload-container" data-field-type="image">
-                    <button type="button" class="button urf-upload-button" data-multiple="false">
-                        <?php _e('Select Image', 'ultimate-repeater-field'); ?>
+                <div class="car-file-upload-container" data-field-type="image">
+                    <button type="button" class="button car-upload-button" data-multiple="false">
+                        <?php _e('Select Image', 'custom-advance-repeater'); ?>
                     </button>
-                    <input type="hidden" name="<?php echo $name; ?>" id="<?php echo $id; ?>" value="<?php echo esc_attr($image_value); ?>" class="urf-file-input">
+                    <input type="hidden" name="<?php echo $name; ?>" id="<?php echo $id; ?>" value="<?php echo esc_attr($image_value); ?>" class="car-file-input">
                     
-                    <div class="urf-file-preview">
+                    <div class="car-file-preview">
                         <?php if (!empty($image_value)): 
                             if (is_numeric($image_value)) {
                                 $image_url = wp_get_attachment_url($image_value);
@@ -3644,14 +3642,14 @@ class Ultimate_Repeater_Field {
                                 $filename = basename($image_url);
                             } else {
                                 $image_url = $image_value;
-                                $image_thumb = '<img src="' . esc_url($image_value) . '" class="urf-image-preview">';
+                                $image_thumb = '<img src="' . esc_url($image_value) . '" class="car-image-preview">';
                                 $filename = basename($image_value);
                             }
                         ?>
-                            <div class="urf-file-item" data-attachment-id="<?php echo esc_attr($image_value); ?>">
+                            <div class="car-file-item" data-attachment-id="<?php echo esc_attr($image_value); ?>">
                                 <?php echo $image_thumb; ?>
-                                <div class="urf-file-name"><?php echo esc_html($filename); ?></div>
-                                <button type="button" class="urf-remove-file dashicons dashicons-no-alt" title="<?php _e('Remove', 'ultimate-repeater-field'); ?>"></button>
+                                <div class="car-file-name"><?php echo esc_html($filename); ?></div>
+                                <button type="button" class="car-remove-file dashicons dashicons-no-alt" title="<?php _e('Remove', 'custom-advance-repeater'); ?>"></button>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -3669,7 +3667,7 @@ class Ultimate_Repeater_Field {
                         id="<?php echo $id; ?>" 
                         class="widefat"
                         <?php echo $required ? 'required' : ''; ?>>
-                    <option value=""><?php _e('-- Select --', 'ultimate-repeater-field'); ?></option>
+                    <option value=""><?php _e('-- Select --', 'custom-advance-repeater'); ?></option>
                     <?php
                     $options = explode("\n", $field['options'] ?? '');
                     foreach ($options as $option) {
@@ -3694,7 +3692,7 @@ class Ultimate_Repeater_Field {
                 
             case 'checkbox':
                 ?>
-                <div class="urf-checkbox-group">
+                <div class="car-checkbox-group">
                     <?php
                     $values = is_array($value) ? $value : array($value);
                     $options = explode("\n", $field['options'] ?? '');
@@ -3730,7 +3728,7 @@ class Ultimate_Repeater_Field {
                     $radio_value = !empty($radio_value) ? reset($radio_value) : '';
                 }
                 ?>
-                <div class="urf-radio-group">
+                <div class="car-radio-group">
                     <?php
                     $options = explode("\n", $field['options'] ?? '');
                     foreach ($options as $option) {
@@ -3770,7 +3768,7 @@ class Ultimate_Repeater_Field {
                        name="<?php echo $name; ?>" 
                        id="<?php echo $id; ?>" 
                        value="<?php echo esc_attr($color_value); ?>" 
-                       class="urf-colorpicker"
+                       class="car-colorpicker"
                        data-default-color="#ffffff">
                 <?php
                 break;
@@ -3785,7 +3783,7 @@ class Ultimate_Repeater_Field {
                        name="<?php echo $name; ?>" 
                        id="<?php echo $id; ?>" 
                        value="<?php echo esc_attr($date_value); ?>" 
-                       class="urf-datepicker widefat"
+                       class="car-datepicker widefat"
                        <?php echo $required ? 'required' : ''; ?>>
                 <?php
                 break;
@@ -3808,7 +3806,7 @@ class Ultimate_Repeater_Field {
     }
     
     public function render_nested_repeater_row($subfields, $parent_field_name, $group_slug, $parent_row_index, $nested_index, $nested_row, $is_clone = false) {
-    $row_class = $is_clone ? 'urf-clone-nested-row' : '';
+    $row_class = $is_clone ? 'car-clone-nested-row' : '';
     $display = $is_clone ? 'style="display: none;"' : '';
     
     $index_name = $is_clone ? '__NESTED_INDEX__' : $nested_index;
@@ -3816,7 +3814,7 @@ class Ultimate_Repeater_Field {
     
     ?>
     <tr class="<?php echo $row_class; ?>" <?php echo $display; ?> data-nested-index="<?php echo $index_name; ?>">
-        <td class="urf-row-handle" style="width: 60px; min-width: 60px; max-width: 60px;">
+        <td class="car-row-handle" style="width: 60px; min-width: 60px; max-width: 60px;">
             <span class="dashicons dashicons-menu"></span>
             <span class="nested-row-index"><?php echo $display_index; ?></span>
         </td>
@@ -3827,10 +3825,10 @@ class Ultimate_Repeater_Field {
                     $subfield_name = $subfield['name'];
                     $field_value = isset($nested_row[$subfield_name]) ? $nested_row[$subfield_name] : '';
                     
-                    $input_name = "urf_data[{$group_slug}][{$parent_field_name}][{$index_name}][{$subfield_name}]";
-                    $input_id = "urf_{$group_slug}_{$parent_field_name}_{$index_name}_{$subfield_name}";
+                    $input_name = "car_data[{$group_slug}][{$parent_field_name}][{$index_name}][{$subfield_name}]";
+                    $input_id = "car_{$group_slug}_{$parent_field_name}_{$index_name}_{$subfield_name}";
                 ?>
-                    <div class="urf-subfield-container" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: <?php echo ($subfield_index === count($subfields) - 1) ? '0' : '15px'; ?>;">
+                    <div class="car-subfield-container" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: <?php echo ($subfield_index === count($subfields) - 1) ? '0' : '15px'; ?>;">
                         <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
                             <div style="flex: 0 0 150px;">
                                 <label style="font-weight: 600; color: #1e293b; display: block; margin-bottom: 8px;">
@@ -3848,18 +3846,18 @@ class Ultimate_Repeater_Field {
                                     $nested_repeater_data = is_array($field_value) ? $field_value : array();
                                     $nested_subfields = isset($subfield['subfields']) ? $subfield['subfields'] : array();
                                     ?>
-                                    <div class="urf-nested-repeater" 
+                                    <div class="car-nested-repeater" 
                                          data-field-name="<?php echo esc_attr($subfield_name); ?>" 
                                          data-parent-field="<?php echo esc_attr($parent_field_name); ?>"
                                          data-row-index="<?php echo esc_attr($index_name); ?>">
                                         
                                        
                                         
-                                        <div class="urf-nested-table-container" style="overflow-x: auto;">
-                                            <table class="urf-repeater-table urf-nested-table" style="margin-top: 10px; width: 100%;">
+                                        <div class="car-nested-table-container" style="overflow-x: auto;">
+                                            <table class="car-repeater-table car-nested-table" style="margin-top: 10px; width: 100%;">
                                                 <thead>
                                                     <tr>
-                                                        <th class="urf-row-handle" style="width: 50px;">#</th>
+                                                        <th class="car-row-handle" style="width: 50px;">#</th>
                                                         <?php foreach ($nested_subfields as $nested_subfield): ?>
                                                             <th style="min-width: 150px;"><?php echo esc_html($nested_subfield['label']); ?>
                                                                 <?php if ($nested_subfield['required'] ?? false): ?>
@@ -3867,10 +3865,10 @@ class Ultimate_Repeater_Field {
                                                                 <?php endif; ?>
                                                             </th>
                                                         <?php endforeach; ?>
-                                                        <th class="urf-row-actions" style="width: 80px;"><?php _e('Actions', 'ultimate-repeater-field'); ?></th>
+                                                        <th class="car-row-actions" style="width: 80px;"><?php _e('Actions', 'custom-advance-repeater'); ?></th>
                                                     </tr>
                                                 </thead>
-                                                <tbody class="urf-nested-tbody">
+                                                <tbody class="car-nested-tbody">
                                                     <?php if (!empty($nested_repeater_data)): 
                                                         $nested2_index = 0;
                                                         foreach ($nested_repeater_data as $nested2_row): ?>
@@ -3884,12 +3882,12 @@ class Ultimate_Repeater_Field {
                                             </table>
                                         </div>
                                         
-                                        <button type="button" class="button button-small urf-add-nested2-row" 
+                                        <button type="button" class="button button-small car-add-nested2-row" 
                                                 data-field-name="<?php echo esc_attr($subfield_name); ?>" 
                                                 data-parent-field="<?php echo esc_attr($parent_field_name); ?>"
                                                 data-row-index="<?php echo esc_attr($index_name); ?>"
                                                 style="margin-top: 10px;">
-                                            <span class="dashicons dashicons-plus"></span> <?php _e('Add Row', 'ultimate-repeater-field'); ?>
+                                            <span class="dashicons dashicons-plus"></span> <?php _e('Add Row', 'custom-advance-repeater'); ?>
                                         </button>
                                     </div>
                                     <?php
@@ -3905,8 +3903,8 @@ class Ultimate_Repeater_Field {
             </div>
         </td>
         
-        <td class="urf-row-actions" style="width: 80px; min-width: 80px; max-width: 80px;">
-            <a href="#" class="urf-remove-nested-row dashicons dashicons-trash" title="<?php _e('Remove Row', 'ultimate-repeater-field'); ?>"></a>
+        <td class="car-row-actions" style="width: 80px; min-width: 80px; max-width: 80px;">
+            <a href="#" class="car-remove-nested-row dashicons dashicons-trash" title="<?php _e('Remove Row', 'custom-advance-repeater'); ?>"></a>
         </td>
     </tr>
     <?php
@@ -3928,7 +3926,7 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
         }
     }
     
-    $row_class = $is_clone ? 'urf-clone-nested2-row' : '';
+    $row_class = $is_clone ? 'car-clone-nested2-row' : '';
     $display = $is_clone ? 'style="display: none;"' : '';
     
     $index_name = $is_clone ? '__NESTED2_INDEX__' : $nested2_index;
@@ -3936,7 +3934,7 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
     
     ?>
     <tr class="<?php echo $row_class; ?>" <?php echo $display; ?> data-nested2-index="<?php echo $index_name; ?>">
-        <td class="urf-row-handle" style="width: 60px; min-width: 60px; max-width: 60px;">
+        <td class="car-row-handle" style="width: 60px; min-width: 60px; max-width: 60px;">
             <span class="dashicons dashicons-menu"></span>
             <span class="nested2-row-index"><?php echo $display_index; ?></span>
         </td>
@@ -3948,10 +3946,10 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
                     $field_value = isset($nested2_row[$subfield_name]) ? $nested2_row[$subfield_name] : '';
                     
                     // Create unique name for nested2 repeater field
-                    $input_name = "urf_data[{$group_slug}][{$parent_field_name}][{$parent_row_index}][{$field_name}][{$index_name}][{$subfield_name}]";
-                    $input_id = "urf_{$group_slug}_{$parent_field_name}_{$parent_row_index}_{$field_name}_{$index_name}_{$subfield_name}";
+                    $input_name = "car_data[{$group_slug}][{$parent_field_name}][{$parent_row_index}][{$field_name}][{$index_name}][{$subfield_name}]";
+                    $input_id = "car_{$group_slug}_{$parent_field_name}_{$parent_row_index}_{$field_name}_{$index_name}_{$subfield_name}";
                 ?>
-                    <div class="urf-subfield-container" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: <?php echo ($subfield_index === count($subfields) - 1) ? '0' : '15px'; ?>;">
+                    <div class="car-subfield-container" style="background: white; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: <?php echo ($subfield_index === count($subfields) - 1) ? '0' : '15px'; ?>;">
                         <div style="display: flex; align-items: flex-start; gap: 15px; margin-bottom: 15px;">
                             <div style="flex: 0 0 150px;">
                                 <label style="font-weight: 600; color: #1e293b; display: block; margin-bottom: 8px;">
@@ -3971,8 +3969,8 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
             </div>
         </td>
         
-        <td class="urf-row-actions" style="width: 80px; min-width: 80px; max-width: 80px; vertical-align: middle;">
-            <a href="#" class="urf-remove-nested2-row dashicons dashicons-trash" title="<?php _e('Remove Row', 'ultimate-repeater-field'); ?>"></a>
+        <td class="car-row-actions" style="width: 80px; min-width: 80px; max-width: 80px; vertical-align: middle;">
+            <a href="#" class="car-remove-nested2-row dashicons dashicons-trash" title="<?php _e('Remove Row', 'custom-advance-repeater'); ?>"></a>
         </td>
     </tr>
     <?php
@@ -3986,20 +3984,20 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
     $this->log('=============================================');
     
     if (
-        !isset($_POST['urf_field_group']) ||
-        !is_array($_POST['urf_field_group']) ||
-        !isset($_POST['urf_data'])
+        !isset($_POST['car_field_group']) ||
+        !is_array($_POST['car_field_group']) ||
+        !isset($_POST['car_data'])
     ) {
-        $this->log('ERROR: No urf_field_group or urf_data in POST');
+        $this->log('ERROR: No car_field_group or car_data in POST');
         return;
     }
 
     $this->log('POST data keys: ' . print_r(array_keys($_POST), true));
-    $this->log('urf_field_group: ' . print_r($_POST['urf_field_group'], true));
+    $this->log('car_field_group: ' . print_r($_POST['car_field_group'], true));
     
-    if (isset($_POST['urf_data'])) {
-        $this->log('urf_data structure preview:');
-        foreach ($_POST['urf_data'] as $group => $data) {
+    if (isset($_POST['car_data'])) {
+        $this->log('car_data structure preview:');
+        foreach ($_POST['car_data'] as $group => $data) {
             $this->log('  Group: ' . $group);
             if (is_array($data)) {
                 foreach ($data as $field => $value) {
@@ -4022,11 +4020,11 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
     }
 
     // Verify nonces
-    foreach ($_POST['urf_field_group'] as $group_slug) {
-        $nonce_key = 'urf_nonce_' . $group_slug;
+    foreach ($_POST['car_field_group'] as $group_slug) {
+        $nonce_key = 'car_nonce_' . $group_slug;
         if (
             empty($_POST[$nonce_key]) ||
-            !wp_verify_nonce($_POST[$nonce_key], 'urf_save_fields_' . $group_slug)
+            !wp_verify_nonce($_POST[$nonce_key], 'car_save_fields_' . $group_slug)
         ) {
             $this->log('ERROR: Nonce verification failed for group: ' . $group_slug);
             return;
@@ -4034,13 +4032,13 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
     }
 
     global $wpdb;
-    $table_name = $wpdb->prefix . 'urf_fields';
+    $table_name = $wpdb->prefix . 'car_fields';
 
     // Get field groups to identify image fields
-    $group_table = $wpdb->prefix . 'urf_field_groups';
+    $group_table = $wpdb->prefix . 'car_field_groups';
     $image_fields = [];
     
-    foreach ($_POST['urf_field_group'] as $group_slug) {
+    foreach ($_POST['car_field_group'] as $group_slug) {
         $group = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$group_table} WHERE slug = %s",
             $group_slug
@@ -4058,13 +4056,13 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
         }
     }
 
-    $this->log('Processing ' . count($_POST['urf_data']) . ' field groups');
+    $this->log('Processing ' . count($_POST['car_data']) . ' field groups');
     
     // Process each field group
-    foreach ($_POST['urf_data'] as $group_slug => $data) {
+    foreach ($_POST['car_data'] as $group_slug => $data) {
         $this->log('--- Processing Group: ' . $group_slug . ' ---');
         
-        if (!in_array($group_slug, $_POST['urf_field_group'], true)) {
+        if (!in_array($group_slug, $_POST['car_field_group'], true)) {
             $this->log('Skipping: Group not in allowed list');
             continue;
         }
@@ -4412,14 +4410,14 @@ public function render_nested2_repeater_row($subfields, $field_name, $group_slug
 // Add this logging method to the class
 private function log($message) {
     if (defined('WP_DEBUG') && WP_DEBUG) {
-        error_log('[URF DEBUG] ' . date('Y-m-d H:i:s') . ' - ' . $message);
+        error_log('[Custom Advance Repeater DEBUG] ' . date('Y-m-d H:i:s') . ' - ' . $message);
     }
 }
 
-// Add this method to the Ultimate_Repeater_Field class
+// Add this method to the Custom_Advance_Repeater class
 public function debug_database_state($post_id) {
     global $wpdb;
-    $table_name = $wpdb->prefix . 'urf_fields';
+    $table_name = $wpdb->prefix . 'car_fields';
     
     $results = $wpdb->get_results($wpdb->prepare(
         "SELECT * FROM {$table_name} 
@@ -4453,7 +4451,7 @@ public function debug_database_state($post_id) {
 
     private function is_image_field_in_nested($group_slug, $repeater_name, $field_name) {
         global $wpdb;
-        $group_table = $wpdb->prefix . 'urf_field_groups';
+        $group_table = $wpdb->prefix . 'car_field_groups';
         
         $group = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM {$group_table} WHERE slug = %s",
@@ -4483,112 +4481,140 @@ public function debug_database_state($post_id) {
         return false;
     }
 
-    public function get_field_data($post_id, $group_slug) {
-    global $wpdb;
-    $table_name = $wpdb->prefix . 'urf_fields';
+       public function get_field_data($post_id, $group_slug) {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'car_fields';
 
-    $group_table = $wpdb->prefix . 'urf_field_groups';
-    $group = $wpdb->get_row($wpdb->prepare(
-        "SELECT * FROM $group_table WHERE slug = %s",
-        $group_slug
-    ));
+        $group_table = $wpdb->prefix . 'car_field_groups';
+        $group = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $group_table WHERE slug = %s",
+            $group_slug
+        ));
 
-    if (!$group || !$this->should_display_field_group($group, $post_id)) {
-        return [];
-    }
+        if (!$group || !$this->should_display_field_group($group, $post_id)) {
+            return [];
+        }
 
-    $single_fields = $this->get_single_field_values($post_id, $group_slug);
-    
-    $repeater_fields = [];
-    $fields = maybe_unserialize($group->fields);
-    
-    if (is_array($fields)) {
-        foreach ($fields as $field) {
-            if ($field['type'] === 'repeater') {
-                $repeater_name = $field['name'];
-                
-                $nested_group = 'nested_' . $group_slug . '_' . $repeater_name;
-
-                $nested_rows = $wpdb->get_results($wpdb->prepare(
-                    "SELECT * FROM $table_name
-                     WHERE post_id = %d AND field_group = %s
-                     ORDER BY parent_row_index, field_order",
-                    $post_id,
-                    $nested_group
-                ));
-
-                $grouped_data = [];
-                foreach ($nested_rows as $row) {
-                    $value = maybe_unserialize($row->field_value);
-                    $n = (int) $row->parent_row_index;
-                    $field_type = $row->field_type;
+        $single_fields = $this->get_single_field_values($post_id, $group_slug);
+        
+        $repeater_fields = [];
+        $fields = maybe_unserialize($group->fields);
+        
+        if (is_array($fields)) {
+            foreach ($fields as $field) {
+                if ($field['type'] === 'repeater') {
+                    $repeater_name = $field['name'];
                     
-                    // Handle nested2 repeater data differently
-                    if ($field_type === 'nested2') {
-                        if (!isset($grouped_data[$n])) {
-                            $grouped_data[$n] = [];
+                    $nested_group = 'nested_' . $group_slug . '_' . $repeater_name;
+
+                    $nested_rows = $wpdb->get_results($wpdb->prepare(
+                        "SELECT * FROM $table_name
+                         WHERE post_id = %d AND field_group = %s
+                         ORDER BY parent_row_index, field_order",
+                        $post_id,
+                        $nested_group
+                    ));
+
+                    $grouped_data = [];
+                    foreach ($nested_rows as $row) {
+                        $value = maybe_unserialize($row->field_value);
+                        $n = (int) $row->parent_row_index;
+                        $field_type = $row->field_type;
+                        
+                        // Handle nested2 repeater data differently
+                        if ($field_type === 'nested2') {
+                            if (!isset($grouped_data[$n])) {
+                                $grouped_data[$n] = [];
+                            }
+                            
+                            $parent_field = $row->parent_field;
+                            $row_index = (int) $row->row_index;
+                            
+                            if (!isset($grouped_data[$n][$parent_field])) {
+                                $grouped_data[$n][$parent_field] = [];
+                            }
+                            
+                            if (!isset($grouped_data[$n][$parent_field][$row_index])) {
+                                $grouped_data[$n][$parent_field][$row_index] = [];
+                            }
+                            
+                            $grouped_data[$n][$parent_field][$row_index][$row->field_name] = $value;
+                        } else {
+                            $grouped_data[$n][$row->field_name] = $value;
                         }
-                        
-                        $parent_field = $row->parent_field;
-                        $row_index = (int) $row->row_index;
-                        
-                        if (!isset($grouped_data[$n][$parent_field])) {
-                            $grouped_data[$n][$parent_field] = [];
-                        }
-                        
-                        if (!isset($grouped_data[$n][$parent_field][$row_index])) {
-                            $grouped_data[$n][$parent_field][$row_index] = [];
-                        }
-                        
-                        $grouped_data[$n][$parent_field][$row_index][$row->field_name] = $value;
-                    } else {
-                        $grouped_data[$n][$row->field_name] = $value;
                     }
-                }
-                
-                // Filter out empty rows
-                $filtered_data = [];
-                foreach ($grouped_data as $row_index => $row_data) {
-                    // Check if row has any non-empty values
-                    $has_content = false;
-                    foreach ($row_data as $field_name => $field_value) {
-                        if (is_array($field_value)) {
-                            // For nested repeaters
-                            foreach ($field_value as $nested_row) {
-                                if (!empty($nested_row)) {
-                                    $has_content = true;
-                                    break 2;
+                    
+                    // SIMPLIFIED FILTERING - Remove completely empty parent rows
+                    $filtered_data = [];
+                    foreach ($grouped_data as $row_index => $row_data) {
+                        // Skip completely empty rows
+                        if (empty($row_data)) {
+                            continue;
+                        }
+                        
+                        // Check if this row has any non-empty values
+                        $has_content = false;
+                        
+                        foreach ($row_data as $field_name => $field_value) {
+                            // If it's nested2 data, check if it has any content
+                            if (is_array($field_value) && isset($field_value[0]) && is_array($field_value[0])) {
+                                // Check nested2 rows
+                                foreach ($field_value as $nested2_row) {
+                                    if (!empty($nested2_row)) {
+                                        $has_content = true;
+                                        break 2;
+                                    }
+                                }
+                            } 
+                            // Check if regular field has content
+                            else if (!empty($field_value) || $field_value === '0' || $field_value === 0 || $field_value === false) {
+                                $has_content = true;
+                                break;
+                            }
+                        }
+                        
+                        if ($has_content) {
+                            // Clean up empty nested2 rows
+                            foreach ($row_data as $field_name => &$field_value) {
+                                if (is_array($field_value) && isset($field_value[0]) && is_array($field_value[0])) {
+                                    $clean_nested2 = [];
+                                    foreach ($field_value as $nested2_row) {
+                                        if (!empty($nested2_row)) {
+                                            $clean_nested2[] = $nested2_row;
+                                        }
+                                    }
+                                    $field_value = $clean_nested2;
                                 }
                             }
-                        } else if (!empty($field_value) && $field_value !== '' && $field_value !== null) {
-                            $has_content = true;
-                            break;
+                            unset($field_value);
+                            
+                            $filtered_data[] = $row_data;
                         }
                     }
                     
-                    if ($has_content) {
-                        $filtered_data[] = $row_data;
-                    }
+                    $repeater_fields[$repeater_name] = $filtered_data;
                 }
-                
-                $repeater_fields[$repeater_name] = $filtered_data;
             }
         }
-    }
 
-    $data = array_merge($single_fields, $repeater_fields);
-    
-    return $data;
-}
+        // FIX: Filter out empty repeater fields
+        $repeater_fields = array_filter($repeater_fields, function($data) {
+            return !empty($data);
+        });
+
+        $data = array_merge($single_fields, $repeater_fields);
+        
+        return $data;
+    }
     
     public function frontend_enqueue_scripts() {
         ?>
         <style>
-        .urf-frontend-output {
+        .car-frontend-output {
             margin: 40px 0;
         }
         
-        .urf-frontend-field-group {
+        .car-frontend-field-group {
             margin-bottom: 40px;
             padding: 30px;
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
@@ -4600,7 +4626,7 @@ public function debug_database_state($post_id) {
             border-left: 5px solid #667eea;
         }
         
-        .urf-frontend-field-group h3 {
+        .car-frontend-field-group h3 {
             margin-top: 0;
             margin-bottom: 25px;
             padding-bottom: 15px;
@@ -4610,20 +4636,20 @@ public function debug_database_state($post_id) {
             font-weight: 700;
         }
         
-        .urf-frontend-field {
+        .car-frontend-field {
             margin-bottom: 25px;
             padding-bottom: 25px;
             border-bottom: 2px dashed #e2e8f0;
             position: relative;
         }
         
-        .urf-frontend-field:last-child {
+        .car-frontend-field:last-child {
             margin-bottom: 0;
             padding-bottom: 0;
             border-bottom: none;
         }
         
-        .urf-frontend-label {
+        .car-frontend-label {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -4636,7 +4662,7 @@ public function debug_database_state($post_id) {
             position: relative;
         }
         
-        .urf-frontend-label::before {
+        .car-frontend-label::before {
             content: '';
             display: inline-block;
             width: 8px;
@@ -4652,7 +4678,7 @@ public function debug_database_state($post_id) {
             100% { opacity: 1; }
         }
         
-        .urf-frontend-value {
+        .car-frontend-value {
             font-size: 16px;
             line-height: 1.8;
             color: #475569;
@@ -4660,7 +4686,7 @@ public function debug_database_state($post_id) {
             position: relative;
         }
         
-        .urf-frontend-value::before {
+        .car-frontend-value::before {
             content: '→';
             position: absolute;
             left: 0;
@@ -4668,7 +4694,7 @@ public function debug_database_state($post_id) {
             font-weight: bold;
         }
         
-        .urf-frontend-value img {
+        .car-frontend-value img {
             max-width: 100%;
             height: auto;
             border-radius: 12px;
@@ -4677,7 +4703,7 @@ public function debug_database_state($post_id) {
             transition: all 0.3s ease;
         }
         
-        .urf-frontend-nested-repeater {
+        .car-frontend-nested-repeater {
             margin-top: 20px;
             padding: 25px;
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
@@ -4686,7 +4712,7 @@ public function debug_database_state($post_id) {
             box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
         }
         
-        .urf-frontend-nested-row {
+        .car-frontend-nested-row {
             padding: 20px;
             margin-bottom: 15px;
             background: white;
@@ -4698,12 +4724,12 @@ public function debug_database_state($post_id) {
             overflow: hidden;
         }
         
-        .urf-frontend-nested-row:hover {
+        .car-frontend-nested-row:hover {
             transform: translateX(5px);
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
         }
         
-        .urf-frontend-nested-field {
+        .car-frontend-nested-field {
             margin-bottom: 15px;
             padding-bottom: 15px;
             border-bottom: 1px solid #f1f5f9;
@@ -4712,13 +4738,13 @@ public function debug_database_state($post_id) {
             gap: 15px;
         }
         
-        .urf-frontend-nested-field:last-child {
+        .car-frontend-nested-field:last-child {
             margin-bottom: 0;
             padding-bottom: 0;
             border-bottom: none;
         }
         
-        .urf-frontend-nested-field strong {
+        .car-frontend-nested-field strong {
             min-width: 140px;
             color: #1e293b;
             font-weight: 600;
@@ -4732,26 +4758,26 @@ public function debug_database_state($post_id) {
         }
         
         @media (max-width: 768px) {
-            .urf-frontend-field-group {
+            .car-frontend-field-group {
                 padding: 20px;
                 margin-bottom: 25px;
             }
             
-            .urf-frontend-field {
+            .car-frontend-field {
                 margin-bottom: 20px;
                 padding-bottom: 20px;
             }
             
-            .urf-frontend-label {
+            .car-frontend-label {
                 font-size: 16px;
             }
             
-            .urf-frontend-value {
+            .car-frontend-value {
                 font-size: 15px;
                 padding-left: 15px;
             }
             
-            .urf-frontend-nested-field {
+            .car-frontend-nested-field {
                 flex-direction: column;
                 gap: 8px;
             }
@@ -4769,15 +4795,15 @@ public function debug_database_state($post_id) {
         ), $atts);
         
         if (empty($atts['field'])) {
-            return '<div class="urf-error">' . __('Please specify a field name', 'ultimate-repeater-field') . '</div>';
+            return '<div class="car-error">' . __('Please specify a field name', 'custom-advance-repeater') . '</div>';
         }
         
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         $group = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE slug = %s", $atts['field']));
         
         if (!$group) {
-            return '<div class="urf-error">' . __('Field group not found!', 'ultimate-repeater-field') . '</div>';
+            return '<div class="car-error">' . __('Field group not found!', 'custom-advance-repeater') . '</div>';
         }
         
         if (!$this->should_display_field_group($group, $atts['post_id'])) {
@@ -4794,8 +4820,8 @@ public function debug_database_state($post_id) {
         
         ob_start();
         ?>
-        <div class="urf-frontend-output">
-            <div class="urf-frontend-field-group">
+        <div class="car-frontend-output">
+            <div class="car-frontend-field-group">
                 <h3><?php echo esc_html($group->name); ?></h3>
                 
                 <?php foreach ($fields as $field): 
@@ -4808,14 +4834,14 @@ public function debug_database_state($post_id) {
                     
                     if ($field['type'] === 'repeater') {
                         ?>
-                        <div class="urf-frontend-field urf-nested-repeater-field">
-                            <div class="urf-frontend-label"><?php echo esc_html($field['label']); ?></div>
-                            <div class="urf-frontend-nested-repeater">
+                        <div class="car-frontend-field car-nested-repeater-field">
+                            <div class="car-frontend-label"><?php echo esc_html($field['label']); ?></div>
+                            <div class="car-frontend-nested-repeater">
                                 <?php 
                                 if (is_array($field_value)) {
                                     foreach ($field_value as $nested_index => $nested_row) {
                                         ?>
-                                        <div class="urf-frontend-nested-row">
+                                        <div class="car-frontend-nested-row">
                                             <?php 
                                             $subfields = $field['subfields'] ?? array();
                                             foreach ($subfields as $subfield) {
@@ -4824,7 +4850,7 @@ public function debug_database_state($post_id) {
                                                     continue;
                                                 }
                                                 ?>
-                                                <div class="urf-frontend-nested-field">
+                                                <div class="car-frontend-nested-field">
                                                     <strong><?php echo esc_html($subfield['label']); ?>:</strong>
                                                     <?php echo $this->format_field_value($subfield, $subfield_value); ?>
                                                 </div>
@@ -4841,9 +4867,9 @@ public function debug_database_state($post_id) {
                         <?php
                     } else {
                         ?>
-                        <div class="urf-frontend-field">
-                            <div class="urf-frontend-label"><?php echo esc_html($field['label']); ?></div>
-                            <div class="urf-frontend-value">
+                        <div class="car-frontend-field">
+                            <div class="car-frontend-label"><?php echo esc_html($field['label']); ?></div>
+                            <div class="car-frontend-value">
                                 <?php echo $this->format_field_value($field, $field_value); ?>
                             </div>
                         </div>
@@ -4957,7 +4983,7 @@ public function debug_database_state($post_id) {
         }
         
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         $group = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table_name WHERE slug = %s", 
             $group_slug
@@ -5071,7 +5097,7 @@ public function debug_database_state($post_id) {
     }
     
     public function ajax_get_field_group() {
-        if (!check_ajax_referer('urf_ajax_nonce', 'nonce', false)) {
+        if (!check_ajax_referer('car_ajax_nonce', 'nonce', false)) {
             wp_die('Security check failed');
         }
         
@@ -5086,7 +5112,7 @@ public function debug_database_state($post_id) {
     }
     
     public function ajax_get_pages() {
-        if (!check_ajax_referer('urf_ajax_nonce', 'nonce', false)) {
+        if (!check_ajax_referer('car_ajax_nonce', 'nonce', false)) {
             wp_die('Security check failed');
         }
         
@@ -5111,25 +5137,25 @@ public function debug_database_state($post_id) {
     
     public function get_field_group_by_slug($slug) {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         return $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE slug = %s", $slug));
     }
 }
 
 // Initialize the plugin
-function urf_init() {
-    Ultimate_Repeater_Field::get_instance();
+function car_init() {
+    Custom_Advance_Repeater::get_instance();
 }
-add_action('plugins_loaded', 'urf_init');
+add_action('plugins_loaded', 'car_init');
 
 // Helper functions for theme developers
-if (!function_exists('urf_get_repeater')) {
-    function urf_get_repeater($field_group, $post_id = null) {
-        $plugin = Ultimate_Repeater_Field::get_instance();
+if (!function_exists('car_get_repeater')) {
+    function car_get_repeater($field_group, $post_id = null) {
+        $plugin = Custom_Advance_Repeater::get_instance();
         $post_id = $post_id ?: get_the_ID();
         
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         $group = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE slug = %s", $field_group));
         
         if (!$group) {
@@ -5144,9 +5170,9 @@ if (!function_exists('urf_get_repeater')) {
     }
 }
 
-if (!function_exists('urf_display_repeater')) {
-    function urf_display_repeater($field_group, $post_id = null, $limit = -1) {
-        $plugin = Ultimate_Repeater_Field::get_instance();
+if (!function_exists('car_display_repeater')) {
+    function car_display_repeater($field_group, $post_id = null, $limit = -1) {
+        $plugin = Custom_Advance_Repeater::get_instance();
         $atts = array(
             'field' => $field_group,
             'post_id' => $post_id ?: get_the_ID(),
@@ -5156,19 +5182,18 @@ if (!function_exists('urf_display_repeater')) {
     }
 }
 
-if (!function_exists('urf_get_field_groups')) {
-    function urf_get_field_groups() {
+if (!function_exists('car_get_field_groups')) {
+    function car_get_field_groups() {
         global $wpdb;
-        $table_name = $wpdb->prefix . 'urf_field_groups';
+        $table_name = $wpdb->prefix . 'car_field_groups';
         return $wpdb->get_results("SELECT * FROM $table_name ORDER BY name ASC");
     }
-	
 }
 
 add_action('admin_footer-post.php', function() {
     global $post;
     if ($post) {
-        $plugin = Ultimate_Repeater_Field::get_instance();
+        $plugin = Custom_Advance_Repeater::get_instance();
         $plugin->debug_database_state($post->ID);
     }
 });
