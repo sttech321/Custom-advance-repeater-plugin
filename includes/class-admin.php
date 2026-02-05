@@ -97,7 +97,7 @@ class Custom_Advance_Repeater_Admin {
                     </ul>
                 </div>
                 <div class="carf-card">
-                    <h2><?php _e('New in Version 1.6.0', 'custom-advance-repeater'); ?></h2>
+                    <h2><?php _e('New in Version  1.8.1', 'custom-advance-repeater'); ?></h2>
                     <ul>
                         <li><strong><?php _e('Nested Repeater Support', 'custom-advance-repeater'); ?></strong> - <?php _e('Repeater fields inside repeater fields', 'custom-advance-repeater'); ?></li>
                         <li><strong><?php _e('Multi-level Nesting', 'custom-advance-repeater'); ?></strong> - <?php _e('Support for deeply nested structures', 'custom-advance-repeater'); ?></li>

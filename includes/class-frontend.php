@@ -151,16 +151,14 @@ class Custom_Advance_Repeater_Frontend {
 
         
         if (!in_array($field_type, ['select', 'checkbox', 'radio'])) {
-            if ($field_type === 'image' && !empty($value)) {
-                if (is_numeric($value)) {
-                    $image_html = wp_get_attachment_image($value, 'medium');
-                } else {
-                    $image_html = '<img src="' . esc_url($value) . '" alt="" style="max-width: 100%; height: auto;">';
-                }
-                return $image_html;
+            if ($field_type === 'image') {
+                // Just return the ID or value as text
+                return esc_html($value);
             }
+
             return nl2br(esc_html($value));
         }
+
         
         $options_string = $field['options'] ?? '';
         if (empty($options_string)) {

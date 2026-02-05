@@ -4,7 +4,8 @@ Plugin Name: Custom Advance Repeater
 Description: A WordPress plugin that allows you to manage dynamic repeater fields with various field types, including nested repeaters.
 Support Email: St.tech321@gmail.com
 Version: 1.8.1
-Author: Supreme
+Author: Supreme Technologies
+Author URI: https://supremetechnologies.us/
 Text Domain: custom-advance-repeater
 Domain Path: /languages
 */
